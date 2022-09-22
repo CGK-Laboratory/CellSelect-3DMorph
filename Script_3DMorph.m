@@ -58,7 +58,11 @@ if Interactive == 2
 end
 
 if Interactive == 2
-   [~,file] = fileparts(FileList{1,total});
+   if ischar(FileList)
+       [~,file] = fileparts(FileList);
+   else
+       [~,file] = fileparts(FileList{1,total});
+   end
 end
 
 %Load in image stack from either .lsm or .tif file
