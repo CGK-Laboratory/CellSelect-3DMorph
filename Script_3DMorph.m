@@ -643,8 +643,22 @@ if BranchLengthFile == 1;
 BranchLengthList=cell(1,numel(FullMg));
 end
 
+if SkelMethod == 1
+    DownSampled = 0;
+    adjust_scale = scale;
+elseif SkelMethod == 2
+   if s(1)>512 %convert large cells to 512x512 to speed up skeletonization. The branch lengths are later adjusted to account for this down-sampling.
+        adjust_scale = 2*scale;
+        DownSampled = 1;
+    else 
+        DownSampled = 0;
+        adjust_scale = scale;
+    end
+end
+
 parfor i=1:numel(FullMg)
     try
+    WholeSkel = 0; %just to remove warning
     ex=zeros(s(1),s(2),zs);%#ok<PFBNS> %Create blank image of correct size
     ex(FullMg{1,i})=1;%write in only one object at a time to image. 
     ds = size(ex); 
@@ -665,18 +679,11 @@ parfor i=1:numel(FullMg)
     
     if SkelMethod == 1
         WholeSkel = SlimSkel3D(ex,100);
-        DownSampled = 0;
-        adjust_scale = scale;
     end
     
     if SkelMethod == 2
         if s(1)>512 %convert large cells to 512x512 to speed up skeletonization. The branch lengths are later adjusted to account for this down-sampling.
             ex = imresize(ex,0.5);
-            adjust_scale = 2*scale;
-            DownSampled = 1;
-        else 
-            DownSampled = 0;
-            adjust_scale = scale;
         end
 
         SmoothEx = imgaussfilt3(ex); %Smooth the cell so skeleton doesn't pick up many fine hairs
