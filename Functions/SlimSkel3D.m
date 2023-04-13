@@ -6,7 +6,7 @@ function [ SlimSkel ] = SlimSkel3D( CellToSkel,THR )
 %INPUT: CellToSkel is a 3D binary image containing the cell we want to
 %skeletonize
 
-    skel = Skeleton3D(CellToSkel);
+    skel = Skeleton3D(logical(CellToSkel));
     [~,node,link] = Skel2Graph3D(skel,THR); % skel is the input 3D binary image, and "THR" is a threshold for the minimum length of branches, to filter out skeletonization artifacts.   
     % ~ is the adjacency matrix with the length of the links as matrix entries, and node/link are the structures describing node and link properties.
     %Graph2Skel3D converts the network graph back into a cleaned-up voxel skeleton image
