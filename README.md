@@ -1,8 +1,9 @@
 # 3DMorph
 3DMorph is a MATLAB-based script that analyzes microglia morphology from 3D data. Outputs include cell and territorial volume, branch length, and number of branch and end points.
 
-
-The main changes of this fork is the use of updated versions of:
+CGK fork
+-----------
+The main change of this fork is the use of updated versions of:
 - [skeleton3D-matlab](https://github.com/phi-max/skeleton3d-matlab)
 - [skel2graph3d](https://github.com/phi-max/skel2graph3d-matlab)
 
