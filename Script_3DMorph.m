@@ -551,16 +551,18 @@ end
 
 % Find the convexvol of only full cells
 FullCellTerritoryVol = zeros(numObjMg,1);
+ConvexCellsFigures = cell(numObjMg,1);
 for i = 1:numObjMg
     [x,y,z] = ind2sub(sz,[FullMg{1,i}]); %input: size of array ind values come from, list of values to convert.
     obj = [y,x,z]; %concatenate x y z coordinates.
     [k,v] = convhulln(obj);
     FullCellTerritoryVol(i,:) = v*voxscale;
     if ConvexCellsImage == 1
-    figure;
-    trisurf(k,obj(:,1),obj(:,2),obj(:,3));
-    axis([0 s(1) 0 s(2) 0 zs]);
-    daspect([1 1 1]);
+        fig = figure;
+        trisurf(k,obj(:,1),obj(:,2),obj(:,3));
+        axis([0 s(1) 0 s(2) 0 zs]);
+        daspect([1 1 1]);
+        ConvexCellsFigures{i} = fig;
     end
 end
 
@@ -638,6 +640,15 @@ if SkelImg||EndImg||BranchImg||OrigCellImg||BranchLengthFile ==1
     folder = mkdir ([file, '_figures']); 
     fpath =([file, '_figures']);
 end 
+
+if ConvexCellsImage == 1
+    for i = 1:numObjMg
+        if ishandle(ConvexCellsFigures{i})
+            filename = ([file '_3D_vol_cell' num2str(i)]);
+            saveas(ConvexCellsFigures{i}, fullfile(fpath, filename), 'jpg');
+        end
+    end
+end
 
 if BranchLengthFile == 1;
 BranchLengthList=cell(1,numel(FullMg));
