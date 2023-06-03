@@ -636,7 +636,7 @@ if Interactive == 1
     uiwait(callgui);
 end
 
-if SkelImg||EndImg||BranchImg||OrigCellImg||BranchLengthFile ==1
+if SkelImg||EndImg||BranchImg||OrigCellImg||BranchLengthFile||ConvexCellsImage ==1
     folder = mkdir ([file, '_figures']); 
     fpath =([file, '_figures']);
 end 
