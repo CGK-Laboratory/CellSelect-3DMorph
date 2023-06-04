@@ -43,7 +43,9 @@ switch choiceMode
         callgui = SelectFilesGUI;
         uiwait(callgui);                
 end
-
+if isempty(choiceMode)
+    return
+end
 for total = 1:numel(FileList)
 %% Load file and saved values
 
