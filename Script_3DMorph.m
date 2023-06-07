@@ -171,10 +171,10 @@ end
 
 if ShowObjImg == 1
     if Interactive ~= 1
-        num = [1:3:(3*numObj+1)];
+        num = 1:3:(3*numObj+1);
         fullimg = ones(s(1),s(2));
         progbar = waitbar(0,'Plotting...');
-        for i = 1:numObj;
+        for i = 1:numObj
             waitbar (i/numObj, progbar);
             ex=zeros(s(1),s(2),zs);
             j=udObjectList(i,2);
@@ -214,7 +214,8 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
         indnuc=bwconncomp(nucmask);%Find these connected comonents (number of remaining nuclei).
         nuc = numel(indnuc.PixelIdxList);%Determine the number of nuclei (how many objects to segment into).
         if nuc ==0 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
-            error('Error: The program finds 0 nuclei to segement your object into. Adjust se=strel(diamond,4) to a lower number to decrease image erosion.');
+            close all
+            errordlg('The program finds 0 nuclei to segment your object into. Adjust se=strel(diamond,4) to a lower number to decrease image erosion.','3DMorph');
         end  
         if nuc ==1 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
             nuc = 2;
@@ -252,12 +253,13 @@ numObjSep = numel(Microglia); %Rewrite the number of objects to include segmente
 
 %Extract list of pixel values and which object they belong to for
 %segmentation viewing (in FullCellsGUI).
-    for i = 1:numObjSep
+SepObjectList = zeros(numObjSep,2,'int32');
+for i = 1:numObjSep
     SepObjectList(i,1) = length(Microglia{1,i}); 
     SepObjectList(i,2) = i;  
-    end
-    SepObjectList = sortrows(SepObjectList,-1); %Sort columns by pixel size. 
-    udSepObjectList = flipud(SepObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
+end
+SepObjectList = sortrows(SepObjectList,-1); %Sort columns by pixel size. 
+udSepObjectList = flipud(SepObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
 
 %Below is used in FullCellsGUI
     for i = 1:numObjSep
@@ -379,31 +381,6 @@ PercentMgVol = ((TotMgVol)/(CubeVol))*100;
 %cells.
 
 if Interactive == 1
-%     Don't need this anymore bc I now generate the image inside the GUI
-%     if ShowCells == 2
-%         %do nothing, the figure is already made
-%     else
-%         num = 1:3:(3*numObjSep+1);
-%         num(1,1) = zeros(1,1);
-%             fullimg = ones(s(1),s(2));
-%     progbar = waitbar(0,'Plotting...');
-%         for i = 1:numObjSep
-%             waitbar (i/numObjSep, progbar);
-%             ex=zeros(s(1),s(2),zs);
-%             j=udSepObjectList(i,2);
-%             ex(Microglia{1,j})=1;%write in only one object to image. Cells are white on black background.
-%             flatex = sum(ex,3);
-%             OutlineImage = zeros(s(1),s(2));
-%             OutlineImage(flatex(:,:)>1)=1;
-%             se = strel('diamond',4);
-%             Outline = imdilate(OutlineImage,se); 
-%             fullimg(Outline(:,:)==1)=1;
-%             fullimg(flatex(:,:)>1)=num(1,i+1);
-%         end
-%             if isgraphics(progbar)
-%             close(progbar);
-%             end
-%     end    
 callgui2 = FullCellsGUI;
 waitfor(callgui2);
 end
@@ -438,11 +415,49 @@ else
 end
 numObjMg = numel(FullMg);% number of microglia after excluding edges and small processes.
 
+
+%%
+%FC code to get only selected cells
+
+if Interactive == 1
+    %this is recomputed, could b better get it from the previous step
+    SepObjectList = zeros(numObjMg,2,'int32');
+    for i = 1:numObjMg
+        SepObjectList(i,1) = length(FullMg{1,i}); 
+        SepObjectList(i,2) = i;  
+    end
+    SepObjectList = sortrows(SepObjectList,-1); %Sort columns by pixel size. 
+    udSepObjectList = flipud(SepObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
+
+    %this is recomputed, could b better get it from the previous step
+    clear AllSeparatedObjs
+    for i = 1:numObjMg
+        ex=zeros(s(1),s(2),zs);
+        ex(FullMg{1,i})=1;%write in only one object to image. Cells are white on black background.
+        flatex = sum(ex,3);
+        AllSeparatedObjs(:,:,i) = flatex(:,:); 
+    end
+    
+    AcceptedCells = true(numObjMg,1);
+    callgui2 = SelectCellsGUI;
+    waitfor(callgui2);
+    FullMg = FullMg(1,AcceptedCells);
+    numObjMg = numel(FullMg);% number of microglia after excluding rejected ones
+
+    if isgraphics(progbar)
+        close(progbar);
+    end
+end
+
+%%
+
+
+
 %Extract list of pixel values and which object they belong to for
 %segmentation viewing (in FullCellsGUI).
 for i = 1:numObjMg
-MgObjectList(i,1) = length(FullMg{1,i}); 
-MgObjectList(i,2) = i;  
+    MgObjectList(i,1) = length(FullMg{1,i}); 
+    MgObjectList(i,2) = i;  
 end
 MgObjectList = sortrows(MgObjectList,-1); %Sort columns by pixel size. 
 udMgObjectList = flipud(MgObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
@@ -652,8 +667,8 @@ if ConvexCellsImage == 1
     end
 end
 
-if BranchLengthFile == 1;
-BranchLengthList=cell(1,numel(FullMg));
+if BranchLengthFile == 1
+    BranchLengthList=cell(1,numel(FullMg));
 end
 
 if SkelMethod == 1
@@ -863,7 +878,7 @@ end
 
 %Save Branch Lengths File
  if BranchLengthFile == 1
-     names = ["cell1"];
+     names = "cell1";
      %Write in headings
     for CellNum = 1:numel(FullMg)
         input = strcat('Cell ',num2str(CellNum));
