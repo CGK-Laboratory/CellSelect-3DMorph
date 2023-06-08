@@ -441,7 +441,7 @@ if Interactive == 1
     AcceptedCells = true(numObjMg,1);
     callgui2 = SelectCellsGUI;
     waitfor(callgui2);
-    FullMg = FullMg(1,AcceptedCells);
+    FullMg = FullMg(1,SepObjectList(AcceptedCells,2));
     numObjMg = numel(FullMg);% number of microglia after excluding rejected ones
 
     if isgraphics(progbar)
