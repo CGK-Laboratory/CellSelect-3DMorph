@@ -653,6 +653,12 @@ if Interactive == 1
     uiwait(callgui);
 end
 
+if isempty(SkelImg), SkelImg=false; end
+if isempty(EndImg), EndImg=false; end
+if isempty(BranchImg), BranchImg=false; end
+if isempty(OrigCellImg), OrigCellImg=false; end
+if isempty(BranchLengthFile), BranchLengthFile=false; end
+            
 if SkelImg||EndImg||BranchImg||OrigCellImg||BranchLengthFile||ConvexCellsImage ==1
     folder = mkdir ([file, '_figures']); 
     fpath =([file, '_figures']);
