@@ -43,7 +43,9 @@ switch choiceMode
         callgui = SelectFilesGUI;
         uiwait(callgui);                
 end
-
+if isempty(choiceMode)
+    return
+end
 for total = 1:numel(FileList)
 %% Load file and saved values
 
@@ -169,10 +171,10 @@ end
 
 if ShowObjImg == 1
     if Interactive ~= 1
-        num = [1:3:(3*numObj+1)];
+        num = 1:3:(3*numObj+1);
         fullimg = ones(s(1),s(2));
         progbar = waitbar(0,'Plotting...');
-        for i = 1:numObj;
+        for i = 1:numObj
             waitbar (i/numObj, progbar);
             ex=zeros(s(1),s(2),zs);
             j=udObjectList(i,2);
@@ -205,14 +207,15 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
     if  numel(ConnectedComponents.PixelIdxList{1,i}) > CellSizeCutoff %If the size of the current connected component is greater than our predefined cutoff value, segment it.
         ex=zeros(s(1),s(2),zs);%Create blank image of correct size.
         ex(ConnectedComponents.PixelIdxList{1,i})=1;%write object onto blank array so only the cell pixels = 1.
-        se=strel('diamond',6); %Set how much, and what shape, we want to erode by. If increase, erosion will be greater.
+        se=strel('diamond',5); %Set how much, and what shape, we want to erode by. If increase, erosion will be greater.
         nucmask=imerode(ex,se);%Erode to find nuclei only. This erosion is large - don't want any remaining thick branch pieces.
         nucsize = round((CellSizeCutoff/50),0);
         nucmask=bwareaopen(nucmask,nucsize);%Get rid of leftover tiny spots. Increase second input argument to remove more spots (and decrease segmentation)
         indnuc=bwconncomp(nucmask);%Find these connected comonents (number of remaining nuclei).
         nuc = numel(indnuc.PixelIdxList);%Determine the number of nuclei (how many objects to segment into).
         if nuc ==0 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
-            error('Error: The program finds 0 nuclei to segement your object into. Adjust se=strel(diamond,4) to a lower number to decrease image erosion.');
+            close all
+            errordlg('The program finds 0 nuclei to segment your object into. Adjust se=strel(diamond,4) to a lower number to decrease image erosion.','3DMorph');
         end  
         if nuc ==1 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
             nuc = 2;
@@ -250,12 +253,13 @@ numObjSep = numel(Microglia); %Rewrite the number of objects to include segmente
 
 %Extract list of pixel values and which object they belong to for
 %segmentation viewing (in FullCellsGUI).
-    for i = 1:numObjSep
+SepObjectList = zeros(numObjSep,2,'int32');
+for i = 1:numObjSep
     SepObjectList(i,1) = length(Microglia{1,i}); 
     SepObjectList(i,2) = i;  
-    end
-    SepObjectList = sortrows(SepObjectList,-1); %Sort columns by pixel size. 
-    udSepObjectList = flipud(SepObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
+end
+SepObjectList = sortrows(SepObjectList,-1); %Sort columns by pixel size. 
+udSepObjectList = flipud(SepObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
 
 %Below is used in FullCellsGUI
     for i = 1:numObjSep
@@ -377,31 +381,6 @@ PercentMgVol = ((TotMgVol)/(CubeVol))*100;
 %cells.
 
 if Interactive == 1
-%     Don't need this anymore bc I now generate the image inside the GUI
-%     if ShowCells == 2
-%         %do nothing, the figure is already made
-%     else
-%         num = 1:3:(3*numObjSep+1);
-%         num(1,1) = zeros(1,1);
-%             fullimg = ones(s(1),s(2));
-%     progbar = waitbar(0,'Plotting...');
-%         for i = 1:numObjSep
-%             waitbar (i/numObjSep, progbar);
-%             ex=zeros(s(1),s(2),zs);
-%             j=udSepObjectList(i,2);
-%             ex(Microglia{1,j})=1;%write in only one object to image. Cells are white on black background.
-%             flatex = sum(ex,3);
-%             OutlineImage = zeros(s(1),s(2));
-%             OutlineImage(flatex(:,:)>1)=1;
-%             se = strel('diamond',4);
-%             Outline = imdilate(OutlineImage,se); 
-%             fullimg(Outline(:,:)==1)=1;
-%             fullimg(flatex(:,:)>1)=num(1,i+1);
-%         end
-%             if isgraphics(progbar)
-%             close(progbar);
-%             end
-%     end    
 callgui2 = FullCellsGUI;
 waitfor(callgui2);
 end
@@ -436,11 +415,49 @@ else
 end
 numObjMg = numel(FullMg);% number of microglia after excluding edges and small processes.
 
+
+%%
+%FC code to get only selected cells
+
+if Interactive == 1
+    %this is recomputed, could b better get it from the previous step
+    SepObjectList = zeros(numObjMg,2,'int32');
+    for i = 1:numObjMg
+        SepObjectList(i,1) = length(FullMg{1,i}); 
+        SepObjectList(i,2) = i;  
+    end
+    SepObjectList = sortrows(SepObjectList,-1); %Sort columns by pixel size. 
+    udSepObjectList = flipud(SepObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
+
+    %this is recomputed, could b better get it from the previous step
+    clear AllSeparatedObjs
+    for i = 1:numObjMg
+        ex=zeros(s(1),s(2),zs);
+        ex(FullMg{1,i})=1;%write in only one object to image. Cells are white on black background.
+        flatex = sum(ex,3);
+        AllSeparatedObjs(:,:,i) = flatex(:,:); 
+    end
+    
+    AcceptedCells = true(numObjMg,1);
+    callgui2 = SelectCellsGUI;
+    waitfor(callgui2);
+    FullMg = FullMg(1,SepObjectList(AcceptedCells,2));
+    numObjMg = numel(FullMg);% number of microglia after excluding rejected ones
+
+    if isgraphics(progbar)
+        close(progbar);
+    end
+end
+
+%%
+
+
+
 %Extract list of pixel values and which object they belong to for
 %segmentation viewing (in FullCellsGUI).
 for i = 1:numObjMg
-MgObjectList(i,1) = length(FullMg{1,i}); 
-MgObjectList(i,2) = i;  
+    MgObjectList(i,1) = length(FullMg{1,i}); 
+    MgObjectList(i,2) = i;  
 end
 MgObjectList = sortrows(MgObjectList,-1); %Sort columns by pixel size. 
 udMgObjectList = flipud(MgObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
@@ -551,16 +568,18 @@ end
 
 % Find the convexvol of only full cells
 FullCellTerritoryVol = zeros(numObjMg,1);
+ConvexCellsFigures = cell(numObjMg,1);
 for i = 1:numObjMg
     [x,y,z] = ind2sub(sz,[FullMg{1,i}]); %input: size of array ind values come from, list of values to convert.
     obj = [y,x,z]; %concatenate x y z coordinates.
     [k,v] = convhulln(obj);
     FullCellTerritoryVol(i,:) = v*voxscale;
     if ConvexCellsImage == 1
-    figure;
-    trisurf(k,obj(:,1),obj(:,2),obj(:,3));
-    axis([0 s(1) 0 s(2) 0 zs]);
-    daspect([1 1 1]);
+        fig = figure;
+        trisurf(k,obj(:,1),obj(:,2),obj(:,3));
+        axis([0 s(1) 0 s(2) 0 zs]);
+        daspect([1 1 1]);
+        ConvexCellsFigures{i} = fig;
     end
 end
 
@@ -634,13 +653,28 @@ if Interactive == 1
     uiwait(callgui);
 end
 
-if SkelImg||EndImg||BranchImg||OrigCellImg||BranchLengthFile ==1
+if isempty(SkelImg), SkelImg=false; end
+if isempty(EndImg), EndImg=false; end
+if isempty(BranchImg), BranchImg=false; end
+if isempty(OrigCellImg), OrigCellImg=false; end
+if isempty(BranchLengthFile), BranchLengthFile=false; end
+            
+if SkelImg||EndImg||BranchImg||OrigCellImg||BranchLengthFile||ConvexCellsImage ==1
     folder = mkdir ([file, '_figures']); 
     fpath =([file, '_figures']);
 end 
 
-if BranchLengthFile == 1;
-BranchLengthList=cell(1,numel(FullMg));
+if ConvexCellsImage == 1
+    for i = 1:numObjMg
+        if ishandle(ConvexCellsFigures{i})
+            filename = ([file '_3D_vol_cell' num2str(i)]);
+            saveas(ConvexCellsFigures{i}, fullfile(fpath, filename), 'jpg');
+        end
+    end
+end
+
+if BranchLengthFile == 1
+    BranchLengthList=cell(1,numel(FullMg));
 end
 
 if SkelMethod == 1
@@ -850,7 +884,7 @@ end
 
 %Save Branch Lengths File
  if BranchLengthFile == 1
-     names = ["cell1"];
+     names = "cell1";
      %Write in headings
     for CellNum = 1:numel(FullMg)
         input = strcat('Cell ',num2str(CellNum));

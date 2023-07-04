@@ -29,9 +29,10 @@ function [ mask ] = ConnectPointsAlongPath( InputImg, StartPt, EndPt )
     D(EndPt(1),EndPt(2),EndPt(3),2) = 0;
     mask = D==0; %matrix with 1s (true) where D is 0. All branch pixels are Inf.
     n = 0; %n is the number of steps taken from starting point.
+    cube = ones([3 3 3],'single');
     while isinf(D(EndPt(1),EndPt(2),EndPt(3)))&nnz(mask),% continue stepping while the endpoint (but in the first image) is inf. Once the path is connected, this value will be overwritten to 1, meaning the loop is complete. nnz = number of nonzero elements. If the path is not completed, but there are no remaining connections, the mask will only have 0s. Both of these conditions must be 1 (true) to continue.
         n = n+1;
-        mask = convn(mask,ones([3 3 3]),'same')&isinf(D); %Convolves with cube of ones to see attached pixels?
+        mask = convn(mask,cube,'same')&isinf(D); %Convolves with cube of ones to see attached pixels?
         D(mask) = n;
     end
     if isinf(D(EndPt(1),EndPt(2),EndPt(3))) %If the above loop ended, it's complete or there's no path. If it ended, but the first condition is still true (the endpoint is still Inf), then there must not have been a connecting path.

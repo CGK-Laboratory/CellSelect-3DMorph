@@ -27,11 +27,11 @@ function varargout = CellSizeCutoffGUI(varargin)
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @CellSizeCutoffGUI_OpeningFcn, ...
-                   'gui_OutputFcn',  @CellSizeCutoffGUI_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @CellSizeCutoffGUI_OpeningFcn, ...
+    'gui_OutputFcn',  @CellSizeCutoffGUI_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -61,26 +61,26 @@ voxscale = evalin('base','voxscale');
 ObjectList = evalin('base','ObjectList');
 udObjectList = flipud(ObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
 
-num = [1:3:(3*numObj+1)];
-    fullimg = ones(s(1),s(2));
-    progbar = waitbar(0,'Plotting...');
-    for i = 1:numObj;
-        waitbar (i/numObj, progbar);
-        ex=zeros(s(1),s(2),zs);
-        j=udObjectList(i,2);
-        ex(ConnectedComponents.PixelIdxList{1,j})=1;%write in only one object to image. Cells are white on black background.
-        flatex = sum(ex,3);
-        OutlineImage = zeros(s(1),s(2));
-        OutlineImage(flatex(:,:)>1)=1;
-        se = strel('diamond',4);
-        Outline = imdilate(OutlineImage,se); 
-        fullimg(Outline(:,:)==1)=1;
-        fullimg(flatex(:,:)>1)=num(1,i+1);
-    end
-if isgraphics(progbar)
-   close(progbar);
+num = 1:3:(3*numObj+1);
+fullimg = ones(s(1),s(2));
+progbar = waitbar(0,'Plotting...');
+for i = 1:numObj
+    waitbar (i/numObj, progbar);
+    ex=zeros(s(1),s(2),zs);
+    j=udObjectList(i,2);
+    ex(ConnectedComponents.PixelIdxList{1,j})=1;%write in only one object to image. Cells are white on black background.
+    flatex = sum(ex,3);
+    OutlineImage = zeros(s(1),s(2));
+    OutlineImage(flatex(:,:)>1)=1;
+    se = strel('diamond',4);
+    Outline = imdilate(OutlineImage,se);
+    fullimg(Outline(:,:)==1)=1;
+    fullimg(flatex(:,:)>1)=num(1,i+1);
 end
-        
+if isgraphics(progbar)
+    close(progbar);
+end
+
 cmap = jet(max(fullimg(:)));
 cmap(1,:) = zeros(1,3);
 axes(handles.AllObjects);
@@ -95,7 +95,7 @@ set(handles.listbox1,'String',ObjectListInUnit(:,1));
 setappdata(handles.CellSizeCutoffGUI,'cmap',cmap);
 assignin('base','cmap', getappdata(handles.CellSizeCutoffGUI,'cmap'));
 
-setappdata(handles.CellSizeCutoffGUI,'fullimg',fullimg); 
+setappdata(handles.CellSizeCutoffGUI,'fullimg',fullimg);
 % Choose default command line output for CellSizeCutoffGUI
 handles.output = hObject;
 
@@ -107,7 +107,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = CellSizeCutoffGUI_OutputFcn(hObject, eventdata, handles) 
+function varargout = CellSizeCutoffGUI_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -198,6 +198,6 @@ function OutputImage_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of OutputImage
 
-box = get(hObject,'Value'); 
+box = get(hObject,'Value');
 % Store application data
-setappdata(handles.CellSizeCutoffGUI,'ShowObjImgs',box); 
+setappdata(handles.CellSizeCutoffGUI,'ShowObjImgs',box);
