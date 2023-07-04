@@ -207,7 +207,7 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
     if  numel(ConnectedComponents.PixelIdxList{1,i}) > CellSizeCutoff %If the size of the current connected component is greater than our predefined cutoff value, segment it.
         ex=zeros(s(1),s(2),zs);%Create blank image of correct size.
         ex(ConnectedComponents.PixelIdxList{1,i})=1;%write object onto blank array so only the cell pixels = 1.
-        se=strel('diamond',6); %Set how much, and what shape, we want to erode by. If increase, erosion will be greater.
+        se=strel('diamond',5); %Set how much, and what shape, we want to erode by. If increase, erosion will be greater.
         nucmask=imerode(ex,se);%Erode to find nuclei only. This erosion is large - don't want any remaining thick branch pieces.
         nucsize = round((CellSizeCutoff/50),0);
         nucmask=bwareaopen(nucmask,nucsize);%Get rid of leftover tiny spots. Increase second input argument to remove more spots (and decrease segmentation)
