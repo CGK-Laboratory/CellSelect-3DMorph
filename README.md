@@ -33,8 +33,8 @@ For more information,troubleshooting tips, and to cite, please refer to [paper](
 - 32 Gigabytes of RAM
 - Have Windows 7 or above
 
-  CGK fork
------------
+CGK fork
+--------
 The main change of this fork is the use of updated versions of:
 - [skeleton3D-matlab](https://github.com/phi-max/skeleton3d-matlab)
 - [skel2graph3d](https://github.com/phi-max/skel2graph3d-matlab)
