@@ -18,9 +18,6 @@ Once complete, a Parameters file will be saved to the MATLAB Current Folder. Thi
 
 Control and ExCell images are provided as test samples. 
 
-For more information,troubleshooting tips, and to cite, please refer to [paper](https://pubmed.ncbi.nlm.nih.gov/30627639/). 
-
-
 ## Matlab dependencies:
 - MATLAB >= 2018a
 - Image Processing Toolbox
@@ -28,7 +25,10 @@ For more information,troubleshooting tips, and to cite, please refer to [paper](
 - Parallel Computing Toolbox
 - MATLAB Parallel Server
 - Polyspace Bug Finder
-
+## Differences
+- New Cell Selection Functionality
+-  Erosion of images for better segmentation was achieved by changing line 210 of the code from the original  se=strel('diamond',6) to  se=strel('diamond',5)
+-  There are pop-up errors for segmenting errors finding 0 cells
 ## Requirements 
 - 32 Gigabytes of RAM
 - Have Windows 7 or above
