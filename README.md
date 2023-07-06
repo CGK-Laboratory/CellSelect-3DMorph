@@ -3,7 +3,7 @@
 # ![alt text](https://github.com/CGK-Laboratory/CellSelect_3DMorph/assets/133057205/d60b2df0-8cf7-4f96-a414-1ec078b68b2f "Logo Title Text 1")
 
 
-Cell-Select-3DMorph is a MATLAB-based script that analyzes cells morphology from 3D images, by recontructing the cells from the flourecent pixels. The recontruction is measuring all cells: cell volume and territorial volume,Ramification index, branch length, number of branch and end points, and more. CellSelect, as the name implies, adds the possibility of rejecting any cell that is not fully in the frame of the image and which morphology cannot be calculated properly. 
+CellSelect-3DMorph is a MATLAB-based script that analyzes cells morphology from 3D images, by recontructing the cells from the flourecent pixels. The recontruction is measuring all cells: cell volume and territorial volume,Ramification index, branch length, number of branch and end points, and more. CellSelect, as the name implies, adds the possibility of rejecting any cell that is not fully in the frame of the image and which morphology cannot be calculated properly. 
 
 
 
