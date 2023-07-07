@@ -1,17 +1,14 @@
-<img align="right" src="https://github.com/CGK-Laboratory/CellSelect_3DMorph/assets/133057205/85b9d95c-4999-4944-80aa-28f07bd9375c" width="500">
 
 # ![alt text](https://github.com/CGK-Laboratory/CellSelect_3DMorph/assets/133057205/d60b2df0-8cf7-4f96-a414-1ec078b68b2f "Logo Title Text 1")
 
-
-CellSelect-3DMorph is a MATLAB-based script that analyzes cells morphology from 3D images, by recontructing the cells from the flourecent pixels. The recontruction is measuring all cells: cell volume and territorial volume,Ramification index, branch length, number of branch and end points, and more. CellSelect, as the name implies, adds the possibility of rejecting any cell that is not fully in the frame of the image and which morphology cannot be calculated properly. 
-
-
+<img align="right" src="https://github.com/CGK-Laboratory/CellSelect_3DMorph/assets/133057205/bbd0f481-f15c-49b2-98b6-31d6dfef41d4" width="500">
+CellSelect-3DMorph is a MATLAB-based script that isolate and analyzes cells morphology from 3D images, by reconstructing the cells from fluorescent pixels. The code allows to obtain different parameters including cell volume (exact number of pixels occupied by the cell), territorial volume (maximum cell extension), ramification index (territorial volume/cell volume), branch length, number of branch and end points, and more. CellSelect uses the 3D Morph developed code but now adds the possibility of rejecting any cell that is not complete in the frame of the image (x, y and z positions) and which the morphology cannot be calculated properly.
 
 
 Description
 ===========
 ## Uses
-CellSelect-3DMorph as its predecesor (3DMorph) was specifically made to analyze microglia morphology. This is because microglia function is closely related to its morphology, as a non-ramified microglia have phagocytic functions while more ramified microglia have surveying functions in the cellular environment. CellSelect is used in our lab to have an approximate function of microgla. Other cells morphology can also give an aproximate function of the cell like astrocytes and the software could also help with this analysis, however the lab has never done so. 
+CellSelect-3DMorph as its predecessor (3DMorph) was specifically developed to isolate and analyze microglia morphology. Literature have indicated that microglia function is closely related to its morphology, for example a non-ramified microglia have been interpreted as increased microglia phagocytic functions while a more ramified microglia have surveying functions in the cellular environment. We use CellSelect-3DMorph to study microglia plasticity XXXX. Furthermore, another interesting application of the code could to study astrocyte morphology. 
 
 ## Pipeline
 CellSelect-3DMorph imports .tif or .lsm stacks (3 dimensional images) and processes cell morphologies. 
@@ -31,10 +28,12 @@ Control and ExCell images are provided as test samples.
 ## Differences
 - New Cell Selection Functionality
 -  Erosion of images for better segmentation was achieved by changing line 210 of the code from the original  se=strel('diamond',6) to  se=strel('diamond',5)
--  There are pop-up errors for segmenting errors finding 0 cells
-## Requirements 
+-  There are pop-up windows indicating an error has occurred during segmentation
+  
+  ## Requirements 
 - 32 Gigabytes of RAM
 - Have Windows 7 or above
+  
 
 CGK fork
 --------
