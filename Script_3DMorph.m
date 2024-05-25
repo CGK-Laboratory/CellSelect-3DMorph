@@ -28,8 +28,9 @@ switch choiceMode
         Interactive = 1;
         NoImages = 0;
         FileDataGUI;
-        addpath(pathname);
-        [~,file] = fileparts(file);
+        %addpath(pathname);
+        [~,file] = fileparts(file); %removes extension
+        input_file_path = fullfile(pathname, filename);
         % example: file = 'con1_CD68_2'; scale = 0.46125; %1 pixel = ___ um
         FileList = 1;
     case 'Automatic Mode'
@@ -53,46 +54,47 @@ clearvars -except file ch ChannelOfInterest scale zscale Parameters FileList Pat
 
 if Interactive == 2
     load(Parameters);
-    addpath(PathList);
-        if NoImages ==1
+    if NoImages ==1
         ShowImg = 0; ShowObjImg = 0; ShowCells = 0; ShowFullCells = 0; ConvexCellsImage = 0; OrigCellImg = 0; SkelImg = 0; EndImg = 0; BranchImg = 0;
-        end
+    end
 end
 
 if Interactive == 2
    if ischar(FileList)
        [~,file] = fileparts(FileList);
+       input_file_path = fullfile(PathList, FileList);
    else
        [~,file] = fileparts(FileList{1,total});
+       input_file_path = fullfile(PathList{1,total}, FileList{1,total});
    end
 end
 
 %Load in image stack from either .lsm or .tif file
-if exist(strcat(file,'.lsm'),'file') == 2
-%use bfopen to read in .lsm files to variable 'data'. Within data, we want
-%the 1st row and column, which is a list of all channels. From these, we
-%want the _#_ channel (ChannelOfInterest).
-data = bfopen(strcat(file,'.lsm'));
+if endsWith(input_file_path, '.lsm')
+    %use bfopen to read in .lsm files to variable 'data'. Within data, we want
+    %the 1st row and column, which is a list of all channels. From these, we
+    %want the _#_ channel (ChannelOfInterest).
+    data = bfopen(input_file_path);
 
-s = size(data{1,1}{1,1}); % x and y size of the image
-l = length(data{1,1});
-zs = l(:,1)/ch; %Number of z planes
+    s = size(data{1,1}{1,1}); % x and y size of the image
+    l = length(data{1,1});
+    zs = l(:,1)/ch; %Number of z planes
 
-%To read only green data from a 3 channel z-stack, will write as slice 1
-%ch1, 2, 3, then slice 2 ch 1, 2, 3, etc. Need to extract every third image
-%to a new array. [] concatenates all of the retrieved data, but puts them
-%all in many columns, so need to reshape.
-img = reshape([data{1,1}{ChannelOfInterest:ch:end,1}],s(1),s(2),zs); 
+    %To read only green data from a 3 channel z-stack, will write as slice 1
+    %ch1, 2, 3, then slice 2 ch 1, 2, 3, etc. Need to extract every third image
+    %to a new array. [] concatenates all of the retrieved data, but puts them
+    %all in many columns, so need to reshape.
+    img = reshape([data{1,1}{ChannelOfInterest:ch:end,1}],s(1),s(2),zs); 
 end
 
 if exist('img','var')==0 %If both a tiff and lsm file exist, load only the lsm file
     %Open .tif file and reshape channels
-    if exist(strcat(file,'.tif'),'file') == 2
-       tiffInfo = imfinfo(strcat(file,'.tif'));
+    if endsWith(input_file_path, '.tif')
+       tiffInfo = imfinfo(input_file_path);
        no_frame = numel(tiffInfo);
        data = cell(no_frame,1);
        for iStack = 1:no_frame
-       data{iStack} = imread(strcat(file,'.tif'),'Index',iStack);
+        data{iStack} = imread(input_file_path,'Index',iStack);
        end
        data = data(ChannelOfInterest:ch:end,1);
        s = size(data{1,1});

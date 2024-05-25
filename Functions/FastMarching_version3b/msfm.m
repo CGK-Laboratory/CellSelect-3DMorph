@@ -89,8 +89,8 @@ function [T,Y]=msfm(F, SourcePoints, UseSecond, UseCross)
 %   fprintf('MSFM2:  %9.5f %9.5f %9.5f\n', Results{4}(1), Results{4}(2), Results{4}(3));
 %
 % Function is written by D.Kroon University of Twente (Oct 2010)
-add_function_paths();
-
+% Modified by Fernando Chaure (May 2024) Removing addpath, it's expected done
+% 
 if(nargin<3), UseSecond=false; end
 if(nargin<4), UseCross=false; end
 
@@ -106,15 +106,4 @@ else
     else
         T=msfm2d(F, SourcePoints, UseSecond, UseCross);
     end
-end
-
-function add_function_paths()
-try
-    functionname='msfm.m';
-    functiondir=which(functionname);
-    functiondir=functiondir(1:end-length(functionname));
-    addpath([functiondir '/functions'])
-    addpath([functiondir '/shortestpath'])
-catch me
-    disp(me.message);
 end
