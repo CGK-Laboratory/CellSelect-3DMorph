@@ -163,19 +163,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% % 
-% % function FilenameInput_Callback(hObject, ~, handles)
-% % % hObject    handle to FilenameInput (see GCBO)
-% % % eventdata  reserved - to be defined in a future version of MATLAB
-% % % handles    structure with handles and user data (see GUIDATA)
-% % 
-% % % Hints: get(hObject,'String') returns contents of FilenameInput as text
-% % %        str2double(get(hObject,'String')) returns contents of FilenameInput as a double
-% % file = get(hObject,'String');  
-% % % Store application data
-% % setappdata(handles.figure1,'file',file); 
-
 % --- Executes during object creation, after setting all properties.
 function FilenameInput_CreateFcn(hObject, ~, ~)
 % hObject    handle to FilenameInput (see GCBO)
@@ -214,21 +201,6 @@ function ChannelOfInterest_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-
-% % % --- Executes on button press in DoneButton.
-% % function DoneButton2_Callback(hObject, eventdata, handles)
-% % % hObject    handle to DoneButton (see GCBO)
-% % % eventdata  reserved - to be defined in a future version of MATLAB
-% % % handles    structure with handles and user data (see GUIDATA)
-% % assignin('base','ch', getappdata(handles.figure1,'ch'));
-% % assignin('base','scale', getappdata(handles.figure1,'scale'));
-% % assignin('base','zscale', getappdata(handles.figure1,'zscale'));
-% % assignin('base','file', getappdata(handles.figure1,'file'));
-% % assignin('base','ChannelOfInterest', getappdata(handles.figure1,'ChannelOfInterest'));
-% % close(handles.figure1);
-
 
 % --- Executes on key press with focus on DoneButton and none of its controls.
 function DoneButton_KeyPressFcn(hObject, eventdata, handles)
