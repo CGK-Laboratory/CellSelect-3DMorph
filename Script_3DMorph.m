@@ -29,8 +29,8 @@ switch choiceMode
         NoImages = 0;
         FileDataGUI;
         %addpath(pathname);
+        input_file_path = fullfile(pathname, file);
         [~,file] = fileparts(file); %removes extension
-        input_file_path = fullfile(pathname, filename);
         % example: file = 'con1_CD68_2'; scale = 0.46125; %1 pixel = ___ um
         FileList = 1;
     case 'Automatic Mode'
@@ -50,7 +50,7 @@ end
 for total = 1:numel(FileList)
 %% Load file and saved values
 
-clearvars -except file ch ChannelOfInterest scale zscale Parameters FileList PathList Interactive NoImages total
+clearvars -except input_file_path file ch ChannelOfInterest scale zscale Parameters FileList PathList Interactive NoImages total
 
 if Interactive == 2
     load(Parameters);
