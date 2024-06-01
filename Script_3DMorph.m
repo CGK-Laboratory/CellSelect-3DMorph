@@ -50,7 +50,7 @@ end
 for total = 1:numel(FileList)
 %% Load file and saved values
 
-clearvars -except input_file_path file ch ChannelOfInterest scale zscale Parameters FileList PathList Interactive NoImages total
+clearvars -except input_file_path file ch ChannelOfInterest scale Erosion zscale Parameters FileList PathList Interactive NoImages total
 
 if Interactive == 2
     load(Parameters);
@@ -209,7 +209,7 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
     if  numel(ConnectedComponents.PixelIdxList{1,i}) > CellSizeCutoff %If the size of the current connected component is greater than our predefined cutoff value, segment it.
         ex=zeros(s(1),s(2),zs);%Create blank image of correct size.
         ex(ConnectedComponents.PixelIdxList{1,i})=1;%write object onto blank array so only the cell pixels = 1.
-        se=strel('diamond',5); %Set how much, and what shape, we want to erode by. If increase, erosion will be greater.
+        se=strel('diamond',Erosion); %Set how much, and what shape, we want to erode by. If increase, erosion will be greater.
         nucmask=imerode(ex,se);%Erode to find nuclei only. This erosion is large - don't want any remaining thick branch pieces.
         nucsize = round((CellSizeCutoff/50),0);
         nucmask=bwareaopen(nucmask,nucsize);%Get rid of leftover tiny spots. Increase second input argument to remove more spots (and decrease segmentation)
@@ -217,7 +217,7 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
         nuc = numel(indnuc.PixelIdxList);%Determine the number of nuclei (how many objects to segment into).
         if nuc ==0 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
             close all
-            errordlg('The program finds 0 nuclei to segment your object into. Adjust se=strel(diamond,4) to a lower number to decrease image erosion.','3DMorph');
+            errordlg('The program finds 0 nuclei to segment your object into. Adjust Erosion to a lower number.','3DMorph');
         end  
         if nuc ==1 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
             nuc = 2;
@@ -952,7 +952,7 @@ end
 if Interactive == 1
 time = clock;
 name = ['Parameters_',file,'_',num2str(time(1)),num2str(time(2)),num2str(time(3)),num2str(time(4))];
-save(name,'ch','ChannelOfInterest','scale','zscale','adjust','noise','s','ShowImg','ShowObjImg','ShowCells','ShowFullCells','CellSizeCutoff','SmCellCutoff','KeepAllCells','RemoveXY','ConvexCellsImage','SkelMethod','SkelImg','OrigCellImg','EndImg','BranchImg','BranchLengthFile');
+save(name,'ch','ChannelOfInterest','scale','zscale','Erosion','adjust','noise','s','ShowImg','ShowObjImg','ShowCells','ShowFullCells','CellSizeCutoff','SmCellCutoff','KeepAllCells','RemoveXY','ConvexCellsImage','SkelMethod','SkelImg','OrigCellImg','EndImg','BranchImg','BranchLengthFile');
 end
 
 delete(gcp); %close parallel pool so error isn't generated when program is run again.

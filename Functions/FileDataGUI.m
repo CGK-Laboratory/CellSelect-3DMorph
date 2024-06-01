@@ -22,7 +22,7 @@ function varargout = FileDataGUI(varargin)
 
 % Edit the above text to modify the response to help FileDataGUI
 
-% Last Modified by GUIDE v2.5 21-Sep-2017 13:26:25
+% Last Modified by GUIDE v2.5 01-Jun-2024 15:41:10
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -86,6 +86,7 @@ assignin('base','zscale', getappdata(handles.figure1,'zscale'));
 assignin('base','file', getappdata(handles.figure1,'file'));
 assignin('base','pathname', getappdata(handles.figure1,'pathname'));
 assignin('base','ChannelOfInterest', getappdata(handles.figure1,'ChannelOfInterest'));
+assignin('base','Erosion', getappdata(handles.figure1,'Erosion'));
 
 close(handles.figure1);
 
@@ -218,6 +219,7 @@ if strcmp(eventdata.Key,'return')
     assignin('base','file', getappdata(handles.figure1,'file'));
     assignin('base','pathname', getappdata(handles.figure1,'pathname'));
     assignin('base','ChannelOfInterest', getappdata(handles.figure1,'ChannelOfInterest'));
+    assignin('base','Erosion', getappdata(handles.figure1,'Erosion'));    
     close(handles.figure1);
 end
 
@@ -232,3 +234,21 @@ function SelectFileButton_Callback(hObject, eventdata, handles)
 setappdata(handles.figure1,'file',FileName);
 setappdata(handles.figure1,'pathname',PathName);
 set(handles.ShowFileName,'String',FileName);
+
+
+
+function Erosion_Callback(hObject, eventdata, handles)
+Erosion = str2double(get(hObject,'string')); 
+setappdata(handles.figure1,'Erosion',Erosion);
+
+% --- Executes during object creation, after setting all properties.
+function Erosion_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Erosion (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
