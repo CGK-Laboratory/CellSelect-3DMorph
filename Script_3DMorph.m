@@ -109,7 +109,7 @@ voxscale = scale*scale*zscale;%Calculate scale to convert voxels into unit^3.
 if Interactive == 1
 midslice = round(zs/2,0);
 orig = img(:,:,midslice);
-callgui = ThresholdGUI;
+callgui = ThresholdGUI('Name', file);
 uiwait(callgui);
 end
 
@@ -167,7 +167,7 @@ end
 % accuracy and replicability
 
 if Interactive == 1
-    callgui = CellSizeCutoffGUI;
+    callgui = CellSizeCutoffGUI('Name', file);
     waitfor(callgui);
 end
 
@@ -383,7 +383,7 @@ PercentMgVol = ((TotMgVol)/(CubeVol))*100;
 %cells.
 
 if Interactive == 1
-callgui2 = FullCellsGUI;
+callgui2 = FullCellsGUI('Name', file);
 waitfor(callgui2);
 end
 
@@ -441,7 +441,7 @@ if Interactive == 1
     end
     
     AcceptedCells = true(numObjMg,1);
-    callgui2 = SelectCellsGUI;
+    callgui2 = SelectCellsGUI('Name', file);
     waitfor(callgui2);
     FullMg = FullMg(1,SepObjectList(AcceptedCells,2));
     numObjMg = numel(FullMg);% number of microglia after excluding rejected ones
@@ -651,7 +651,7 @@ if Interactive == 1
 end
 
 if Interactive == 1
-    callgui = SkeletonImageGUI;
+    callgui = SkeletonImageGUI('Name', file);
     uiwait(callgui);
 end
 
