@@ -226,29 +226,22 @@ end
 
 % --- Executes on button press in SelectFileButton.
 function SelectFileButton_Callback(hObject, eventdata, handles)
-% hObject    handle to SelectFileButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-[FileName,PathName] = uigetfile({'*.tif';'*.lsm'});
+    % hObject    handle to SelectFileButton (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    [FileName,PathName] = uigetfile({'*.tif';'*.lsm'});
 
-setappdata(handles.figure1,'file',FileName);
-setappdata(handles.figure1,'pathname',PathName);
-set(handles.ShowFileName,'String',FileName);
+    setappdata(handles.figure1,'file',FileName);
+    setappdata(handles.figure1,'pathname',PathName);
+    set(handles.ShowFileName,'String',FileName);
 
 
 
 function Erosion_Callback(hObject, eventdata, handles)
-Erosion = str2double(get(hObject,'string')); 
-setappdata(handles.figure1,'Erosion',Erosion);
+    Erosion = str2double(get(hObject,'string')); 
+    setappdata(handles.figure1,'Erosion',Erosion);
 
-% --- Executes during object creation, after setting all properties.
 function Erosion_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Erosion (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end

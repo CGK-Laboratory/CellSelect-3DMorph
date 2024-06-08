@@ -932,14 +932,14 @@ xlswrite((strcat('Results',file)),{'MinBranchLength'},1,'R1');
 xlswrite((strcat('Results',file)),MinBranchLength(:,1),1,'S');
 
 if Interactive == 2
-disp(['Finished file ' num2str(total) ' of ' num2str(numel(FileList))]);
+    disp(['Finished file ' num2str(total) ' of ' num2str(numel(FileList))]);
 end
 
 handles=findall(0,'type','figure');
 
 for fig = 1:numel(handles) 
-filename = get(handles(fig),'Name');
-saveas(handles(fig), fullfile(fpath, filename), 'jpg');
+    filename = get(handles(fig),'Name');
+    saveas(handles(fig), fullfile(fpath, filename), 'jpg');
 end
 close all;
 
