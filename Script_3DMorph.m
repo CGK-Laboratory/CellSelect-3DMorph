@@ -736,7 +736,7 @@ parfor i=1:numel(FullMg)
       [BoundedSkel, right, left, top, bottom]  = BoundingBoxOfCell(WholeSkel); %Create a bounding box around the skeleton and only analyze this area to significantly increase processing speed. 
       si = size(BoundedSkel);
 
-% Find endpoints, and trace branches from endpoints to centroid    
+    % Find endpoints, and trace branches from endpoints to centroid    
     i2 = floor(cent(i,:)); %From the calculated centroid, find the nearest positive pixel on the skeleton, so we know we're starting from a pixel with value 1.
     if DownSampled == 1
        i2(1) = round(i2(1)/2);
@@ -790,38 +790,38 @@ parfor i=1:numel(FullMg)
     quat = (fullmask(:,:,:))==1;
     
     if SkelImg == 1
-    title = [file,'_Cell',num2str(i)];
-    figure('Name',title); %Plot all branches as primary (red), secondary (yellow), tertiary (green), or quaternary (blue). 
-    hold on
-    fv1=isosurface(pri,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
-    patch(fv1,'FaceColor',[1 0 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
-    camlight %To add lighting/shading
-    lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
-    fv1=isosurface(sec,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
-    patch(fv1,'FaceColor',[1 1 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
-    camlight %To add lighting/shading
-    lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
-    fv1=isosurface(tert,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
-    patch(fv1,'FaceColor',[0 1 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
-    camlight %To add lighting/shading
-    lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
-    fv1=isosurface(quat,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
-    patch(fv1,'FaceColor',[0 0 1],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
-    camlight %To add lighting/shading
-    lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
-    view(0,270); % Look at image from top viewpoint instead of side
-    daspect([1 1 1]);
-    hold off
-    filename = ([file '_Skeleton_cell' num2str(i)]);
-    saveas(gcf, fullfile(fpath, filename), 'jpg');
+        title = [file,'_Cell',num2str(i)];
+        figure('Name',title); %Plot all branches as primary (red), secondary (yellow), tertiary (green), or quaternary (blue). 
+        hold on
+        fv1=isosurface(pri,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
+        patch(fv1,'FaceColor',[1 0 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
+        camlight %To add lighting/shading
+        lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
+        fv1=isosurface(sec,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
+        patch(fv1,'FaceColor',[1 1 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
+        camlight %To add lighting/shading
+        lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
+        fv1=isosurface(tert,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
+        patch(fv1,'FaceColor',[0 1 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
+        camlight %To add lighting/shading
+        lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
+        fv1=isosurface(quat,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
+        patch(fv1,'FaceColor',[0 0 1],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
+        camlight %To add lighting/shading
+        lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
+        view(0,270); % Look at image from top viewpoint instead of side
+        daspect([1 1 1]);
+        hold off
+        filename = ([file '_Skeleton_cell' num2str(i)]);
+        saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
     
     % Find branchpoints
     brpts =zeros(si(1),si(2),si(3),4);
     for kk=1:3 %For branchpoints not connected to end branches (ie. not distal branches). In fullmask, 1 is branch connected to end point, so anything greater than that is included. 
-    temp = (fullmask(:,:,:))>kk;
-    tempendpts = (convn(temp,kernel,'same')==1)& temp; %Get all of the 'distal' endpoints of kk level branches
-    brpts(:,:,:,kk+1)=tempendpts;
+        temp = (fullmask(:,:,:))>kk;
+        tempendpts = (convn(temp,kernel,'same')==1)& temp; %Get all of the 'distal' endpoints of kk level branches
+        brpts(:,:,:,kk+1)=tempendpts;
     end
 
     % Find any branchpoints of 1s onto 4s (ie. final branch coming off of main trunk). 
@@ -950,9 +950,10 @@ end
 %name_date(year month day hour)"
 
 if Interactive == 1
-time = clock;
-name = ['Parameters_',file,'_',num2str(time(1)),num2str(time(2)),num2str(time(3)),num2str(time(4))];
-save(name,'ch','ChannelOfInterest','scale','zscale','Erosion','adjust','noise','s','ShowImg','ShowObjImg','ShowCells','ShowFullCells','CellSizeCutoff','SmCellCutoff','KeepAllCells','RemoveXY','ConvexCellsImage','SkelMethod','SkelImg','OrigCellImg','EndImg','BranchImg','BranchLengthFile');
+    time = clock;
+    name = ['Parameters_',file,'_',num2str(time(1)),num2str(time(2)),num2str(time(3)),num2str(time(4))];
+    save(name,'ch','ChannelOfInterest','scale','zscale','Erosion','adjust','noise','s','ShowImg','ShowObjImg','ShowCells','ShowFullCells','CellSizeCutoff','SmCellCutoff','KeepAllCells','RemoveXY','ConvexCellsImage','SkelMethod','SkelImg','OrigCellImg','EndImg','BranchImg','BranchLengthFile');
+    
 end
 
 delete(gcp); %close parallel pool so error isn't generated when program is run again.
