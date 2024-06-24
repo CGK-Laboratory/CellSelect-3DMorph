@@ -540,10 +540,8 @@ if ShowFullCells == 2
             end
     title = [file,'_Full Cells (compressed to 2D)'];
     figure('Name',title);imagesc(fullimg);
-    yticklabels(cellfun(@(x) str2double(x) * scale, yticklabels));
-    xticklabels(cellfun(@(x) str2double(x) * scale, xticklabels));
-    ylabel('μm')
-    xlabel('μm')
+    change_units(scale,scale)        
+
     colormap(cmap);
     colorbar('Ticks',[1,max(num)], 'TickLabels',{'Small','Large'});
     daspect([1 1 1]);    
@@ -586,14 +584,7 @@ for i = 1:numObjMg
         trisurf(k,obj(:,1),obj(:,2),obj(:,3));
         axis([0 s(1) 0 s(2) 0 zs]);
         daspect([1 1 1]);
-        
-        yticklabels(cellfun(@(x) str2double(x) * scale, yticklabels));
-        xticklabels(cellfun(@(x) str2double(x) * scale, xticklabels));
-        ylabel('μm')
-        xlabel('μm')
-        zticklabels(cellfun(@(x) str2double(x) * zscale, zticklabels));
-        zlabel('μm')
-        
+        change_units(scale,scale,zscale)        
         ConvexCellsFigures{i} = fig;
     end
 end
@@ -722,14 +713,7 @@ parfor i=1:numel(FullMg)
         lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
         view(0,270); % Look at image from top viewpoint instead of side  
         daspect([1 1 1]);
-        
-        yticklabels(cellfun(@(x) str2double(x) * scale, yticklabels));
-        xticklabels(cellfun(@(x) str2double(x) * scale, xticklabels));
-        ylabel('μm')
-        xlabel('μm')
-        zticklabels(cellfun(@(x) str2double(x) * zscale, zticklabels));
-        zlabel('μm')
-        
+        change_units(scale,scale,zscale)
         filename = ([file '_Original_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
@@ -833,14 +817,9 @@ parfor i=1:numel(FullMg)
         view(0,270); % Look at image from top viewpoint instead of side
         daspect([1 1 1]);
         hold off
-        
-        yticklabels(cellfun(@(x) str2double(x) * adjust_scale, yticklabels));
-        xticklabels(cellfun(@(x) str2double(x) * adjust_scale, xticklabels));
-        ylabel('μm')
-        xlabel('μm')
-        zticklabels(cellfun(@(x) str2double(x) * zscale, zticklabels));
-        zlabel('μm')        
-        
+         
+        change_units(adjust_scale,adjust_scale,zscale)        
+
         filename = ([file '_Skeleton_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
@@ -883,14 +862,8 @@ parfor i=1:numel(FullMg)
         lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
         view(0,270);
         daspect([1 1 1]);
-        
-        yticklabels(cellfun(@(x) str2double(x) * adjust_scale, yticklabels));
-        xticklabels(cellfun(@(x) str2double(x) * adjust_scale, xticklabels));
-        ylabel('μm')
-        xlabel('μm')
-        zticklabels(cellfun(@(x) str2double(x) * zscale, zticklabels));
-        zlabel('μm')
-        
+        change_units(adjust_scale,adjust_scale,zscale)        
+
         filename = ([file '_Endpoints_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
@@ -910,14 +883,8 @@ parfor i=1:numel(FullMg)
         view(0,270);
         daspect([1 1 1]);
         
-        
-        yticklabels(cellfun(@(x) str2double(x) * adjust_scale, yticklabels));
-        xticklabels(cellfun(@(x) str2double(x) * adjust_scale, xticklabels));
-        ylabel('μm')
-        xlabel('μm')
-        zticklabels(cellfun(@(x) str2double(x) * zscale, zticklabels));
-        zlabel('μm')
-        
+        change_units(adjust_scale,adjust_scale,zscale)        
+
         filename = ([file '_Branchpoints_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
