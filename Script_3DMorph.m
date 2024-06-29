@@ -31,7 +31,7 @@ switch choiceMode
         FileDataGUI;
         %addpath(pathname);
         input_file_path = fullfile(pathname, file);
-        [~,file] = fileparts(file); %removes extension
+        [~,file] = fileparts(file); %removes extension %this will be the start off all the outputs
         % example: file = 'con1_CD68_2'; scale = 0.46125; %1 pixel = ___ um
         FileList = 1;
     case 'Automatic Mode'
