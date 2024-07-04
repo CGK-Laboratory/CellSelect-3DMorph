@@ -824,7 +824,7 @@ parfor i=1:numel(FullMg)
         daspect([1 1 1]);
         hold off
          
-        change_units(adjust_scale,adjust_scale,zscale)        
+        change_units(adjust_scale,adjust_scale)        
 
         filename = ([file '_Skeleton_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
