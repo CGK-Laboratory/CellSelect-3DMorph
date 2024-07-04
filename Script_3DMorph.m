@@ -719,7 +719,7 @@ parfor i=1:numel(FullMg)
         lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
         view(0,270); % Look at image from top viewpoint instead of side  
         daspect([1 1 1]);
-        change_units(scale,scale,zscale)
+        change_units(scale,scale)
         filename = ([file '_Original_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
@@ -868,7 +868,7 @@ parfor i=1:numel(FullMg)
         lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
         view(0,270);
         daspect([1 1 1]);
-        change_units(adjust_scale,adjust_scale,zscale)        
+        change_units(adjust_scale,adjust_scale)        
 
         filename = ([file '_Endpoints_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
@@ -889,7 +889,7 @@ parfor i=1:numel(FullMg)
         view(0,270);
         daspect([1 1 1]);
         
-        change_units(adjust_scale,adjust_scale,zscale)        
+        change_units(adjust_scale,adjust_scale)        
 
         filename = ([file '_Branchpoints_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
