@@ -34,20 +34,22 @@ switch choiceMode
             print('Config window closed')
             return
         end
-        input_file_path = fullfile(pathname, file);
-        [~,file] = fileparts(file); %removes extension %this will be the start off all the outputs
+        input_file_path = file; 
+        [~,file,~] = fileparts(file); %removes extension %this will be the start off all the outputs
         % example: file = 'con1_CD68_2'; scale = 0.46125; %1 pixel = ___ um
         FileList = 1;
     case 'Automatic Mode'
         Interactive = 2;
         NoImages = 0;
         callgui = SelectFilesGUI;
-        uiwait(callgui);        
+        uiwait(callgui);
+        outputfolder = '.';
     case 'Automatic Mode Without Images'   
         Interactive = 2;
         NoImages = 1;
         callgui = SelectFilesGUI;
-        uiwait(callgui);                
+        uiwait(callgui); 
+        outputfolder = '.';
 end
 if isempty(choiceMode)
     return
@@ -55,7 +57,7 @@ end
 for total = 1:numel(FileList)
 %% Load file and saved values
 
-clearvars -except input_file_path file ch ChannelOfInterest scale Erosion zscale Parameters FileList PathList Interactive NoImages total
+clearvars -except input_file_path file ch ChannelOfInterest scale Erosion zscale Parameters FileList PathList Interactive NoImages total outputfolder
 
 if Interactive == 2
     load(Parameters);
@@ -670,8 +672,8 @@ if isempty(OrigCellImg), OrigCellImg=false; end
 if isempty(BranchLengthFile), BranchLengthFile=false; end
             
 if SkelImg||EndImg||BranchImg||OrigCellImg||BranchLengthFile||ConvexCellsImage ==1
-    folder = mkdir ([file, '_figures']); 
-    fpath =([file, '_figures']);
+    fpath = fullfile(outputfolder, [file, '_figures']);
+    mkdir(fpath); 
 end 
 
 if ConvexCellsImage == 1
@@ -909,44 +911,44 @@ end
         input = strcat('Cell ',num2str(CellNum));
         names(CellNum,1) = input;
     end   
-    BranchFilename = 'BranchLengths';
-    xlswrite(fullfile(fpath, BranchFilename),names(:,:),1,'A1');
+    BranchFilename = fullfile(outputfolder, 'BranchLengths');
+    xlswrite(BranchFilename,names(:,:),1,'A1');
     %Write in data
     for ColNum = 1:numel(FullMg)
         if numel(BranchLengthList{1,ColNum})>0
-            xlswrite(fullfile(fpath, BranchFilename),BranchLengthList{1,ColNum}',1,['B' num2str(ColNum)]);
+            xlswrite(BranchFilename,BranchLengthList{1,ColNum}',1,['B' num2str(ColNum)]);
         end
     end
  end
  
 %% Output results
 %Creates new excel sheet with file name and saves to current folder.
-
-xlswrite((strcat('Results',file)),{file},1,'B1');
-xlswrite((strcat('Results',file)),{'Avg Centroid Distance um'},1,'A2');
-xlswrite((strcat('Results',file)),AvgDist,1,'B2');
-xlswrite((strcat('Results',file)),{'TotMgTerritoryVol um3'},1,'A3');
-xlswrite((strcat('Results',file)),TotMgVol,1,'B3');
-xlswrite((strcat('Results',file)),{'TotUnoccupiedVol um3'},1,'A4');
-xlswrite((strcat('Results',file)),EmptyVol,1,'B4');
-xlswrite((strcat('Results',file)),{'PercentOccupiedVol um3'},1,'A5');
-xlswrite((strcat('Results',file)),PercentMgVol,1,'B5');
-xlswrite((strcat('Results',file)),{'CellTerritoryVol um3'},1,'D1');
-xlswrite((strcat('Results',file)),FullCellTerritoryVol(:,1),1,'E');
-xlswrite((strcat('Results',file)),{'CellVolumes'},1,'F1');
-xlswrite((strcat('Results',file)),CellVolume(:,1),1,'G');
-xlswrite((strcat('Results',file)),{'RamificationIndex'},1,'H1');
-xlswrite((strcat('Results',file)),FullCellComplexity(:,1),1,'I');
-xlswrite((strcat('Results',file)),{'NumOfEndpoints'},1,'J1');
-xlswrite((strcat('Results',file)),numendpts(:,1),1,'K');
-xlswrite((strcat('Results',file)),{'NumOfBranchpoints'},1,'L1');
-xlswrite((strcat('Results',file)),numbranchpts(:,1),1,'M');
-xlswrite((strcat('Results',file)),{'AvgBranchLength'},1,'N1');
-xlswrite((strcat('Results',file)),AvgBranchLength(:,1),1,'O');
-xlswrite((strcat('Results',file)),{'MaxBranchLength'},1,'P1');
-xlswrite((strcat('Results',file)),MaxBranchLength(:,1),1,'Q');
-xlswrite((strcat('Results',file)),{'MinBranchLength'},1,'R1');
-xlswrite((strcat('Results',file)),MinBranchLength(:,1),1,'S');
+xls_filename = fullfile(outputfolder, strcat('Results',file));
+xlswrite(xls_filename,{file},1,'B1');
+xlswrite(xls_filename,{'Avg Centroid Distance um'},1,'A2');
+xlswrite(xls_filename,AvgDist,1,'B2');
+xlswrite(xls_filename,{'TotMgTerritoryVol um3'},1,'A3');
+xlswrite(xls_filename,TotMgVol,1,'B3');
+xlswrite(xls_filename,{'TotUnoccupiedVol um3'},1,'A4');
+xlswrite(xls_filename,EmptyVol,1,'B4');
+xlswrite(xls_filename,{'PercentOccupiedVol um3'},1,'A5');
+xlswrite(xls_filename,PercentMgVol,1,'B5');
+xlswrite(xls_filename,{'CellTerritoryVol um3'},1,'D1');
+xlswrite(xls_filename,FullCellTerritoryVol(:,1),1,'E');
+xlswrite(xls_filename,{'CellVolumes'},1,'F1');
+xlswrite(xls_filename,CellVolume(:,1),1,'G');
+xlswrite(xls_filename,{'RamificationIndex'},1,'H1');
+xlswrite(xls_filename,FullCellComplexity(:,1),1,'I');
+xlswrite(xls_filename,{'NumOfEndpoints'},1,'J1');
+xlswrite(xls_filename,numendpts(:,1),1,'K');
+xlswrite(xls_filename,{'NumOfBranchpoints'},1,'L1');
+xlswrite(xls_filename,numbranchpts(:,1),1,'M');
+xlswrite(xls_filename,{'AvgBranchLength'},1,'N1');
+xlswrite(xls_filename,AvgBranchLength(:,1),1,'O');
+xlswrite(xls_filename,{'MaxBranchLength'},1,'P1');
+xlswrite(xls_filename,MaxBranchLength(:,1),1,'Q');
+xlswrite(xls_filename,{'MinBranchLength'},1,'R1');
+xlswrite(xls_filename,MinBranchLength(:,1),1,'S');
 
 if Interactive == 2
     disp(['Finished file ' num2str(total) ' of ' num2str(numel(FileList))]);
