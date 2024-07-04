@@ -28,7 +28,7 @@ switch choiceMode
     case 'Interactive Mode'
         Interactive = 1;
         NoImages = 0;
-        FileDataGUI;
+        waitfor(main_window);
         %addpath(pathname);
         if isempty('file')
             print('Config window closed')
