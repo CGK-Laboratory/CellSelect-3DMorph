@@ -5,7 +5,13 @@ function change_units(xscale,yscale,zscale)
   xlabel('μm')
 
   if nargin == 3 % zscore in the inputs
-    zticklabels(cellfun(@(x) str2double(x) * zscale, zticklabels));
+    labels=zticklabels;
+    for i =1:length(labels)
+        if ~isempty(labels{i})
+            labels{i}=str2double(labels{i}) * zscale;
+        end
+    end
+    zticklabels(labels);
     zlabel('μm')
   end
 end
