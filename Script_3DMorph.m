@@ -766,7 +766,7 @@ parfor i=1:numel(FullMg)
 
     masklist =zeros(si(1),si(2),si(3),length(EndptList));
     ArclenOfEachBranch = zeros(length(EndptList),1);
-    for j=1:length(EndptList)%Loop through coordinates of endpoint.
+    for j=1:size(EndptList,1)%Loop through coordinates of endpoint.
         i1 = EndptList(j,:); 
         mask = ConnectPointsAlongPath(BoundedSkel,i1,i2);
         masklist(:,:,:,j)=mask;
