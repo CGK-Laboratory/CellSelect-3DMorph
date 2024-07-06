@@ -114,10 +114,10 @@ voxscale = scale*scale*zscale;%Calculate scale to convert voxels into unit^3.
 %% Threshold
 %Load GUI to set thresholding parameters. 
 if Interactive == 1
-midslice = round(zs/2,0);
-orig = img(:,:,midslice);
-callgui = ThresholdGUI('Name', file);
-uiwait(callgui);
+    midslice = round(zs/2,0);
+    orig = img(:,:,midslice);
+    callgui = ThresholdGUI('Name', file);
+    uiwait(callgui);
 end
 
 if Interactive == 2
