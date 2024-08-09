@@ -33,8 +33,8 @@ Control and ExCell images are provided as test samples.
 
 ## Useful Links
 
-Go to the [wiki](https://github.com/CGK-Laboratory/CellSelect-3DMorph/wiki) to find tips and turoeials.
-Go to the [forum](https://github.com/CGK-Laboratory/CellSelect-3DMorph/discussions) to ask questions, see announcements or open a new discussion.
+- Go to the [wiki](https://github.com/CGK-Laboratory/CellSelect-3DMorph/wiki) to find tips and turoeials.
+- Go to the [forum](https://github.com/CGK-Laboratory/CellSelect-3DMorph/discussions) to ask questions, see announcements or open a new discussion.
   
 ## Differences with the original [3DMorph](https://github.com/ElisaYork/3DMorph) by Elisa M York
 - New Cell Selection Functionality (you can manually select which cells to use).
