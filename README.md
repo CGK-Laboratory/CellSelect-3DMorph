@@ -65,3 +65,5 @@ Control and ExCell images are provided as test samples.
 ## Citation
 
 If you find CellSelect-3DMorph useful in your research, please cite:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12587784.svg)](https://doi.org/10.5281/zenodo.12587783)
