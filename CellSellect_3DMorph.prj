@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration file="C:\Users\user\Documents\GitHub\3DMorph\CellSellect_3DMorph.prj" location="C:\Users\user\Documents\GitHub\3DMorph" name="CellSellect_3DMorph" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="636892865" file="C:\Users\user\Documents\GitHub\3DMorph\CellSellect_3DMorph.prj" location="C:\Users\user\Documents\GitHub\3DMorph" name="CellSellect_3DMorph" preferred-package-location="C:\Users\user\Documents\GitHub\3DMorph\CellSellect_3DMorph\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>CellSellect_3DMorph</param.appname>
     <param.icon>${PROJECT_ROOT}\CellSellect_3DMorph_resources\icon.ico</param.icon>
     <param.icons>
@@ -32,7 +32,7 @@
     <param.web.mcr>true</param.web.mcr>
     <param.package.mcr>false</param.package.mcr>
     <param.no.mcr>false</param.no.mcr>
-    <param.web.mcr.name>CellSelect-3DMorph</param.web.mcr.name>
+    <param.web.mcr.name>CellSelect-3DMorph_installer</param.web.mcr.name>
     <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
     <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
     <param.windows.command.prompt>true</param.windows.command.prompt>
@@ -80,7 +80,8 @@
       <file>${PROJECT_ROOT}\Script_3DMorph.m</file>
     </fileset.main>
     <fileset.resources>
-      <file>${PROJECT_ROOT}</file>
+      <file>${PROJECT_ROOT}\Functions</file>
+      <file>${PROJECT_ROOT}\Script_3DMorph.m</file>
     </fileset.resources>
     <fileset.package />
     <fileset.depfun />
