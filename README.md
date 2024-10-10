@@ -9,9 +9,9 @@ CellSelect-3DMorph is a MATLAB-based script that isolate and analyzes cells morp
 
 Description
 ===========
-CellSelect-3DMorph as its predecessor (3DMorph) was specifically developed to isolate and analyze microglia morphology. Literature have indicated that microglia function is closely related to its morphology, for example a non-ramified microglia have been interpreted as increased microglia phagocytic functions while a more ramified microglia have surveying functions in the cellular environment. We use CellSelect-3DMorph to study microglia plasticity. Furthermore, another interesting application of the code could to study astrocyte morphology. 
+CellSelect-3DMorph as its predecessor (3DMorph) was specifically developed to isolate and analyze microglia morphology. Literature has indicated that microglial function can be related to its morphology, making morphology an approximated measure for function, for example, non-ramified microglia have been interpreted as having increased phagocytic functions while more ramified microglia have surveying functions in the cellular environment. We use CellSelect-3DMorph to study microglia plasticity. Furthermore, another interesting application of the code could be to study astrocyte morphology. 
 
-CellSelect-3DMorph imports .tif or .lsm stacks (3 dimensional images) and processes cell morphologies.
+CellSelect-3DMorph imports .tif or .lsm stacks (3-dimensional images) and processes cell morphologies.
 
 ## Use
 
@@ -46,7 +46,7 @@ Control and ExCell images are provided as test samples.
   * [skeleton3D-matlab](https://github.com/phi-max/skeleton3d-matlab)
   * [skel2graph3d](https://github.com/phi-max/skel2graph3d-matlab)
 
-  
+  (ADD photo of Cell SELECT)
   ## Requirements 
 - 32 Gigabytes of RAM
 - Have Windows 7 or above
