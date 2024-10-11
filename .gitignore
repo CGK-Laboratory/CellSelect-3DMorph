@@ -1,3 +1,5 @@
 *.tif
 *.asv
 *.xls
+/CellSellect_3DMorph_resources
+/CellSellect_3DMorph

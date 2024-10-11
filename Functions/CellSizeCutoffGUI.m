@@ -22,7 +22,7 @@ function varargout = CellSizeCutoffGUI(varargin)
 
 % Edit the above text to modify the response to help CellSizeCutoffGUI
 
-% Last Modified by GUIDE v2.5 23-Nov-2017 11:06:07
+% Last Modified by GUIDE v2.5 20-Jul-2024 07:28:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -201,3 +201,16 @@ function OutputImage_Callback(hObject, eventdata, handles)
 box = get(hObject,'Value');
 % Store application data
 setappdata(handles.CellSizeCutoffGUI,'ShowObjImgs',box);
+
+
+% --- Executes on button press in pushbutton2.
+function pushbutton2_Callback(hObject, eventdata, handles)
+    msgbox(["Once you select a pixel value, Matlab will run through all of your objects. If its pixel value is larger than your selected cut off, it will segment this object.";
+        "Matlab will do this by first eroding the object using the diamond method and a value of 3. You can change these values in the script if you want more or less erosion.";
+        "The number of objects left after this erosion is considered to be the number of actual cells within the object. This value and the original object are then passed to the fit Gaussian mixture distribution method (see: fitgmdist), to determine where to separate the cells.";
+        "";                                                                                                
+        "Tip:";
+        "Too much segmentation? It may think a large process is a separate cell. Try increasing the erosion value.";
+        "Losing parts of cells? They are likely not properly connected to the correct cell, and so are removed in the filtering step to remove noise. Try adjusting your noise and threshold values, or removing this function. Warning: you may get a strange effect here during the branch length measurements.";
+        "Find line: ex=bwareaopen(ex,noise);"], ...
+        'Additional Information');
