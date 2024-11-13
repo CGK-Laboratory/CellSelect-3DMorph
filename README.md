@@ -37,6 +37,8 @@ Control and ExCell images are provided as test samples.
 - Go to the [forum](https://github.com/CGK-Laboratory/CellSelect-3DMorph/discussions) to ask questions, see announcements or open a new discussion.
   
 ## Differences with the original [3DMorph](https://github.com/ElisaYork/3DMorph) by Elisa M York
+<img align="right" src="https://github.com/user-attachments/assets/82b49ecb-3333-40d5-8873-73423c41683b" width="700">
+
 - New Cell Selection Functionality (you can manually select which cells to use).
 - Erosion of images for better segmentation was achieved by changing default `erosion` value and inclidun it as a parameter to be saw and change by the user easily.
 - There are pop-up windows indicating an error has occurred during segmentation.
@@ -46,7 +48,7 @@ Control and ExCell images are provided as test samples.
   * [skeleton3D-matlab](https://github.com/phi-max/skeleton3d-matlab)
   * [skel2graph3d](https://github.com/phi-max/skel2graph3d-matlab)
 
-  (ADD photo of Cell SELECT)
+  
   ## Requirements 
 - 32 Gigabytes of RAM
 - Have Windows 7 or above
