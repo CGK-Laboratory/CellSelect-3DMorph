@@ -19,6 +19,7 @@
 % parpool %Open parallel processing. 
 
 addpath(genpath('Functions'));
+addpath(genpath('icons'));
 
 question = {'How would you like to run the script?','Interactive Mode is necessary to set your parameters. Use automatic if you already have a saved Parameters.mat file.'};
 choiceMode = questdlg(question,'Mode Selection','Interactive Mode', 'Automatic Mode', 'Automatic Mode Without Images', 'Interactive Mode');
@@ -27,21 +28,28 @@ switch choiceMode
     case 'Interactive Mode'
         Interactive = 1;
         NoImages = 0;
-        FileDataGUI;
-        addpath(pathname);
-        [~,file] = fileparts(file);
+        waitfor(main_window);
+        %addpath(pathname);
+        if isempty('file')
+            print('Config window closed')
+            return
+        end
+        input_file_path = file; 
+        [~,file,~] = fileparts(file); %removes extension %this will be the start off all the outputs
         % example: file = 'con1_CD68_2'; scale = 0.46125; %1 pixel = ___ um
         FileList = 1;
     case 'Automatic Mode'
         Interactive = 2;
         NoImages = 0;
         callgui = SelectFilesGUI;
-        uiwait(callgui);        
+        uiwait(callgui);
+        outputfolder = '.';
     case 'Automatic Mode Without Images'   
         Interactive = 2;
         NoImages = 1;
         callgui = SelectFilesGUI;
-        uiwait(callgui);                
+        uiwait(callgui); 
+        outputfolder = '.';
 end
 if isempty(choiceMode)
     return
@@ -49,50 +57,51 @@ end
 for total = 1:numel(FileList)
 %% Load file and saved values
 
-clearvars -except file ch ChannelOfInterest scale zscale Parameters FileList PathList Interactive NoImages total
+clearvars -except input_file_path file ch ChannelOfInterest scale Erosion zscale Parameters FileList PathList Interactive NoImages total outputfolder
 
 if Interactive == 2
     load(Parameters);
-    addpath(PathList);
-        if NoImages ==1
+    if NoImages ==1
         ShowImg = 0; ShowObjImg = 0; ShowCells = 0; ShowFullCells = 0; ConvexCellsImage = 0; OrigCellImg = 0; SkelImg = 0; EndImg = 0; BranchImg = 0;
-        end
+    end
 end
 
 if Interactive == 2
    if ischar(FileList)
        [~,file] = fileparts(FileList);
+       input_file_path = fullfile(PathList, FileList);
    else
        [~,file] = fileparts(FileList{1,total});
+       input_file_path = fullfile(PathList{1,total}, FileList{1,total});
    end
 end
 
 %Load in image stack from either .lsm or .tif file
-if exist(strcat(file,'.lsm'),'file') == 2
-%use bfopen to read in .lsm files to variable 'data'. Within data, we want
-%the 1st row and column, which is a list of all channels. From these, we
-%want the _#_ channel (ChannelOfInterest).
-data = bfopen(strcat(file,'.lsm'));
+if endsWith(input_file_path, '.lsm')
+    %use bfopen to read in .lsm files to variable 'data'. Within data, we want
+    %the 1st row and column, which is a list of all channels. From these, we
+    %want the _#_ channel (ChannelOfInterest).
+    data = bfopen(input_file_path);
 
-s = size(data{1,1}{1,1}); % x and y size of the image
-l = length(data{1,1});
-zs = l(:,1)/ch; %Number of z planes
+    s = size(data{1,1}{1,1}); % x and y size of the image
+    l = length(data{1,1});
+    zs = l(:,1)/ch; %Number of z planes
 
-%To read only green data from a 3 channel z-stack, will write as slice 1
-%ch1, 2, 3, then slice 2 ch 1, 2, 3, etc. Need to extract every third image
-%to a new array. [] concatenates all of the retrieved data, but puts them
-%all in many columns, so need to reshape.
-img = reshape([data{1,1}{ChannelOfInterest:ch:end,1}],s(1),s(2),zs); 
+    %To read only green data from a 3 channel z-stack, will write as slice 1
+    %ch1, 2, 3, then slice 2 ch 1, 2, 3, etc. Need to extract every third image
+    %to a new array. [] concatenates all of the retrieved data, but puts them
+    %all in many columns, so need to reshape.
+    img = reshape([data{1,1}{ChannelOfInterest:ch:end,1}],s(1),s(2),zs); 
 end
 
 if exist('img','var')==0 %If both a tiff and lsm file exist, load only the lsm file
     %Open .tif file and reshape channels
-    if exist(strcat(file,'.tif'),'file') == 2
-       tiffInfo = imfinfo(strcat(file,'.tif'));
+    if endsWith(input_file_path, '.tif')
+       tiffInfo = imfinfo(input_file_path);
        no_frame = numel(tiffInfo);
        data = cell(no_frame,1);
        for iStack = 1:no_frame
-       data{iStack} = imread(strcat(file,'.tif'),'Index',iStack);
+        data{iStack} = imread(input_file_path,'Index',iStack);
        end
        data = data(ChannelOfInterest:ch:end,1);
        s = size(data{1,1});
@@ -105,10 +114,10 @@ voxscale = scale*scale*zscale;%Calculate scale to convert voxels into unit^3.
 %% Threshold
 %Load GUI to set thresholding parameters. 
 if Interactive == 1
-midslice = round(zs/2,0);
-orig = img(:,:,midslice);
-callgui = ThresholdGUI;
-uiwait(callgui);
+    midslice = round(zs/2,0);
+    orig = img(:,:,midslice);
+    callgui = ThresholdGUI('Name', file);
+    uiwait(callgui);
 end
 
 if Interactive == 2
@@ -165,7 +174,7 @@ end
 % accuracy and replicability
 
 if Interactive == 1
-    callgui = CellSizeCutoffGUI;
+    callgui = CellSizeCutoffGUI('Name', file);
     waitfor(callgui);
 end
 
@@ -207,7 +216,7 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
     if  numel(ConnectedComponents.PixelIdxList{1,i}) > CellSizeCutoff %If the size of the current connected component is greater than our predefined cutoff value, segment it.
         ex=zeros(s(1),s(2),zs);%Create blank image of correct size.
         ex(ConnectedComponents.PixelIdxList{1,i})=1;%write object onto blank array so only the cell pixels = 1.
-        se=strel('diamond',5); %Set how much, and what shape, we want to erode by. If increase, erosion will be greater.
+        se=strel('diamond',Erosion); %Set how much, and what shape, we want to erode by. If increase, erosion will be greater.
         nucmask=imerode(ex,se);%Erode to find nuclei only. This erosion is large - don't want any remaining thick branch pieces.
         nucsize = round((CellSizeCutoff/50),0);
         nucmask=bwareaopen(nucmask,nucsize);%Get rid of leftover tiny spots. Increase second input argument to remove more spots (and decrease segmentation)
@@ -215,7 +224,7 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
         nuc = numel(indnuc.PixelIdxList);%Determine the number of nuclei (how many objects to segment into).
         if nuc ==0 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
             close all
-            errordlg('The program finds 0 nuclei to segment your object into. Adjust se=strel(diamond,4) to a lower number to decrease image erosion.','3DMorph');
+            errordlg('The program finds 0 nuclei to segment your object into. Adjust Erosion to a lower number.','3DMorph');
         end  
         if nuc ==1 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
             nuc = 2;
@@ -381,7 +390,7 @@ PercentMgVol = ((TotMgVol)/(CubeVol))*100;
 %cells.
 
 if Interactive == 1
-callgui2 = FullCellsGUI;
+callgui2 = FullCellsGUI('Name', file);
 waitfor(callgui2);
 end
 
@@ -439,7 +448,7 @@ if Interactive == 1
     end
     
     AcceptedCells = true(numObjMg,1);
-    callgui2 = SelectCellsGUI;
+    callgui2 = SelectCellsGUI('Name', file);
     waitfor(callgui2);
     FullMg = FullMg(1,SepObjectList(AcceptedCells,2));
     numObjMg = numel(FullMg);% number of microglia after excluding rejected ones
@@ -537,6 +546,8 @@ if ShowFullCells == 2
             end
     title = [file,'_Full Cells (compressed to 2D)'];
     figure('Name',title);imagesc(fullimg);
+    change_units(scale,scale)        
+
     colormap(cmap);
     colorbar('Ticks',[1,max(num)], 'TickLabels',{'Small','Large'});
     daspect([1 1 1]);    
@@ -579,6 +590,7 @@ for i = 1:numObjMg
         trisurf(k,obj(:,1),obj(:,2),obj(:,3));
         axis([0 s(1) 0 s(2) 0 zs]);
         daspect([1 1 1]);
+        change_units(scale,scale,zscale)        
         ConvexCellsFigures{i} = fig;
     end
 end
@@ -649,7 +661,7 @@ if Interactive == 1
 end
 
 if Interactive == 1
-    callgui = SkeletonImageGUI;
+    callgui = SkeletonImageGUI('Name', file);
     uiwait(callgui);
 end
 
@@ -660,8 +672,8 @@ if isempty(OrigCellImg), OrigCellImg=false; end
 if isempty(BranchLengthFile), BranchLengthFile=false; end
             
 if SkelImg||EndImg||BranchImg||OrigCellImg||BranchLengthFile||ConvexCellsImage ==1
-    folder = mkdir ([file, '_figures']); 
-    fpath =([file, '_figures']);
+    fpath = fullfile(outputfolder, [file, '_figures']);
+    mkdir(fpath); 
 end 
 
 if ConvexCellsImage == 1
@@ -707,6 +719,7 @@ parfor i=1:numel(FullMg)
         lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
         view(0,270); % Look at image from top viewpoint instead of side  
         daspect([1 1 1]);
+        change_units(scale,scale)
         filename = ([file '_Original_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
@@ -734,7 +747,7 @@ parfor i=1:numel(FullMg)
       [BoundedSkel, right, left, top, bottom]  = BoundingBoxOfCell(WholeSkel); %Create a bounding box around the skeleton and only analyze this area to significantly increase processing speed. 
       si = size(BoundedSkel);
 
-% Find endpoints, and trace branches from endpoints to centroid    
+    % Find endpoints, and trace branches from endpoints to centroid    
     i2 = floor(cent(i,:)); %From the calculated centroid, find the nearest positive pixel on the skeleton, so we know we're starting from a pixel with value 1.
     if DownSampled == 1
        i2(1) = round(i2(1)/2);
@@ -753,7 +766,7 @@ parfor i=1:numel(FullMg)
 
     masklist =zeros(si(1),si(2),si(3),length(EndptList));
     ArclenOfEachBranch = zeros(length(EndptList),1);
-    for j=1:length(EndptList)%Loop through coordinates of endpoint.
+    for j=1:size(EndptList,1)%Loop through coordinates of endpoint.
         i1 = EndptList(j,:); 
         mask = ConnectPointsAlongPath(BoundedSkel,i1,i2);
         masklist(:,:,:,j)=mask;
@@ -788,38 +801,41 @@ parfor i=1:numel(FullMg)
     quat = (fullmask(:,:,:))==1;
     
     if SkelImg == 1
-    title = [file,'_Cell',num2str(i)];
-    figure('Name',title); %Plot all branches as primary (red), secondary (yellow), tertiary (green), or quaternary (blue). 
-    hold on
-    fv1=isosurface(pri,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
-    patch(fv1,'FaceColor',[1 0 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
-    camlight %To add lighting/shading
-    lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
-    fv1=isosurface(sec,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
-    patch(fv1,'FaceColor',[1 1 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
-    camlight %To add lighting/shading
-    lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
-    fv1=isosurface(tert,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
-    patch(fv1,'FaceColor',[0 1 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
-    camlight %To add lighting/shading
-    lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
-    fv1=isosurface(quat,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
-    patch(fv1,'FaceColor',[0 0 1],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
-    camlight %To add lighting/shading
-    lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
-    view(0,270); % Look at image from top viewpoint instead of side
-    daspect([1 1 1]);
-    hold off
-    filename = ([file '_Skeleton_cell' num2str(i)]);
-    saveas(gcf, fullfile(fpath, filename), 'jpg');
+        title = [file,'_Cell',num2str(i)];
+        figure('Name',title); %Plot all branches as primary (red), secondary (yellow), tertiary (green), or quaternary (blue). 
+        hold on
+        fv1=isosurface(pri,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
+        patch(fv1,'FaceColor',[1 0 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
+        camlight %To add lighting/shading
+        lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
+        fv1=isosurface(sec,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
+        patch(fv1,'FaceColor',[1 1 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
+        camlight %To add lighting/shading
+        lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
+        fv1=isosurface(tert,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
+        patch(fv1,'FaceColor',[0 1 0],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
+        camlight %To add lighting/shading
+        lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
+        fv1=isosurface(quat,0);%display each object as a surface in 3D. Will automatically add the next object to existing image.
+        patch(fv1,'FaceColor',[0 0 1],'FaceAlpha',0.5,'EdgeColor','none');%without edgecolour, will auto fill black, and all objects appear black
+        camlight %To add lighting/shading
+        lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
+        view(0,270); % Look at image from top viewpoint instead of side
+        daspect([1 1 1]);
+        hold off
+         
+        change_units(adjust_scale,adjust_scale)        
+
+        filename = ([file '_Skeleton_cell' num2str(i)]);
+        saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
     
     % Find branchpoints
     brpts =zeros(si(1),si(2),si(3),4);
     for kk=1:3 %For branchpoints not connected to end branches (ie. not distal branches). In fullmask, 1 is branch connected to end point, so anything greater than that is included. 
-    temp = (fullmask(:,:,:))>kk;
-    tempendpts = (convn(temp,kernel,'same')==1)& temp; %Get all of the 'distal' endpoints of kk level branches
-    brpts(:,:,:,kk+1)=tempendpts;
+        temp = (fullmask(:,:,:))>kk;
+        tempendpts = (convn(temp,kernel,'same')==1)& temp; %Get all of the 'distal' endpoints of kk level branches
+        brpts(:,:,:,kk+1)=tempendpts;
     end
 
     % Find any branchpoints of 1s onto 4s (ie. final branch coming off of main trunk). 
@@ -852,6 +868,8 @@ parfor i=1:numel(FullMg)
         lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
         view(0,270);
         daspect([1 1 1]);
+        change_units(adjust_scale,adjust_scale)        
+
         filename = ([file '_Endpoints_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
@@ -870,6 +888,9 @@ parfor i=1:numel(FullMg)
         lighting gouraud; %Set style of lighting. This allows contours, instead of flat lighting
         view(0,270);
         daspect([1 1 1]);
+        
+        change_units(adjust_scale,adjust_scale)        
+
         filename = ([file '_Branchpoints_cell' num2str(i)]);
         saveas(gcf, fullfile(fpath, filename), 'jpg');
     end
@@ -890,54 +911,54 @@ end
         input = strcat('Cell ',num2str(CellNum));
         names(CellNum,1) = input;
     end   
-    BranchFilename = 'BranchLengths';
-    xlswrite(fullfile(fpath, BranchFilename),names(:,:),1,'A1');
+    BranchFilename = fullfile(outputfolder, 'BranchLengths');
+    xlswrite(BranchFilename,names(:,:),1,'A1');
     %Write in data
     for ColNum = 1:numel(FullMg)
         if numel(BranchLengthList{1,ColNum})>0
-            xlswrite(fullfile(fpath, BranchFilename),BranchLengthList{1,ColNum}',1,['B' num2str(ColNum)]);
+            xlswrite(BranchFilename,BranchLengthList{1,ColNum}',1,['B' num2str(ColNum)]);
         end
     end
  end
  
 %% Output results
 %Creates new excel sheet with file name and saves to current folder.
-
-xlswrite((strcat('Results',file)),{file},1,'B1');
-xlswrite((strcat('Results',file)),{'Avg Centroid Distance um'},1,'A2');
-xlswrite((strcat('Results',file)),AvgDist,1,'B2');
-xlswrite((strcat('Results',file)),{'TotMgTerritoryVol um3'},1,'A3');
-xlswrite((strcat('Results',file)),TotMgVol,1,'B3');
-xlswrite((strcat('Results',file)),{'TotUnoccupiedVol um3'},1,'A4');
-xlswrite((strcat('Results',file)),EmptyVol,1,'B4');
-xlswrite((strcat('Results',file)),{'PercentOccupiedVol um3'},1,'A5');
-xlswrite((strcat('Results',file)),PercentMgVol,1,'B5');
-xlswrite((strcat('Results',file)),{'CellTerritoryVol um3'},1,'D1');
-xlswrite((strcat('Results',file)),FullCellTerritoryVol(:,1),1,'E');
-xlswrite((strcat('Results',file)),{'CellVolumes'},1,'F1');
-xlswrite((strcat('Results',file)),CellVolume(:,1),1,'G');
-xlswrite((strcat('Results',file)),{'RamificationIndex'},1,'H1');
-xlswrite((strcat('Results',file)),FullCellComplexity(:,1),1,'I');
-xlswrite((strcat('Results',file)),{'NumOfEndpoints'},1,'J1');
-xlswrite((strcat('Results',file)),numendpts(:,1),1,'K');
-xlswrite((strcat('Results',file)),{'NumOfBranchpoints'},1,'L1');
-xlswrite((strcat('Results',file)),numbranchpts(:,1),1,'M');
-xlswrite((strcat('Results',file)),{'AvgBranchLength'},1,'N1');
-xlswrite((strcat('Results',file)),AvgBranchLength(:,1),1,'O');
-xlswrite((strcat('Results',file)),{'MaxBranchLength'},1,'P1');
-xlswrite((strcat('Results',file)),MaxBranchLength(:,1),1,'Q');
-xlswrite((strcat('Results',file)),{'MinBranchLength'},1,'R1');
-xlswrite((strcat('Results',file)),MinBranchLength(:,1),1,'S');
+xls_filename = fullfile(outputfolder, strcat('Results',file));
+xlswrite(xls_filename,{file},1,'B1');
+xlswrite(xls_filename,{'Avg Centroid Distance um'},1,'A2');
+xlswrite(xls_filename,AvgDist,1,'B2');
+xlswrite(xls_filename,{'TotMgTerritoryVol um3'},1,'A3');
+xlswrite(xls_filename,TotMgVol,1,'B3');
+xlswrite(xls_filename,{'TotUnoccupiedVol um3'},1,'A4');
+xlswrite(xls_filename,EmptyVol,1,'B4');
+xlswrite(xls_filename,{'PercentOccupiedVol um3'},1,'A5');
+xlswrite(xls_filename,PercentMgVol,1,'B5');
+xlswrite(xls_filename,{'CellTerritoryVol um3'},1,'D1');
+xlswrite(xls_filename,FullCellTerritoryVol(:,1),1,'E');
+xlswrite(xls_filename,{'CellVolumes'},1,'F1');
+xlswrite(xls_filename,CellVolume(:,1),1,'G');
+xlswrite(xls_filename,{'RamificationIndex'},1,'H1');
+xlswrite(xls_filename,FullCellComplexity(:,1),1,'I');
+xlswrite(xls_filename,{'NumOfEndpoints'},1,'J1');
+xlswrite(xls_filename,numendpts(:,1),1,'K');
+xlswrite(xls_filename,{'NumOfBranchpoints'},1,'L1');
+xlswrite(xls_filename,numbranchpts(:,1),1,'M');
+xlswrite(xls_filename,{'AvgBranchLength'},1,'N1');
+xlswrite(xls_filename,AvgBranchLength(:,1),1,'O');
+xlswrite(xls_filename,{'MaxBranchLength'},1,'P1');
+xlswrite(xls_filename,MaxBranchLength(:,1),1,'Q');
+xlswrite(xls_filename,{'MinBranchLength'},1,'R1');
+xlswrite(xls_filename,MinBranchLength(:,1),1,'S');
 
 if Interactive == 2
-disp(['Finished file ' num2str(total) ' of ' num2str(numel(FileList))]);
+    disp(['Finished file ' num2str(total) ' of ' num2str(numel(FileList))]);
 end
 
 handles=findall(0,'type','figure');
 
 for fig = 1:numel(handles) 
-filename = get(handles(fig),'Name');
-saveas(handles(fig), fullfile(fpath, filename), 'jpg');
+    filename = get(handles(fig),'Name');
+    saveas(handles(fig), fullfile(fpath, filename), 'jpg');
 end
 close all;
 
@@ -948,9 +969,10 @@ end
 %name_date(year month day hour)"
 
 if Interactive == 1
-time = clock;
-name = ['Parameters_',file,'_',num2str(time(1)),num2str(time(2)),num2str(time(3)),num2str(time(4))];
-save(name,'ch','ChannelOfInterest','scale','zscale','adjust','noise','s','ShowImg','ShowObjImg','ShowCells','ShowFullCells','CellSizeCutoff','SmCellCutoff','KeepAllCells','RemoveXY','ConvexCellsImage','SkelMethod','SkelImg','OrigCellImg','EndImg','BranchImg','BranchLengthFile');
+    time = clock;
+    name = fullfile(outputfolder, ['Parameters_',file,'_',num2str(time(1)),num2str(time(2)),num2str(time(3)),num2str(time(4))]);
+    save(name,'ch','ChannelOfInterest','scale','zscale','Erosion','adjust','noise','s','ShowImg','ShowObjImg','ShowCells','ShowFullCells','CellSizeCutoff','SmCellCutoff','KeepAllCells','RemoveXY','ConvexCellsImage','SkelMethod','SkelImg','OrigCellImg','EndImg','BranchImg','BranchLengthFile');
+    
 end
 
 delete(gcp); %close parallel pool so error isn't generated when program is run again.
