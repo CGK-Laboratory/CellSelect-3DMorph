@@ -1,5 +1,6 @@
 
-# CellSelect-3DMorph <img align="right" src="https://github.com/user-attachments/assets/53e2ba87-6964-4f01-bba3-aa1c7b81e5e0" width="45">
+# 
+# ![# CellSelect-3DMorph ](https://github.com/CGK-Laboratory/.github/assets/133057205/2d6d4003-04c6-4772-a32e-27d45efd12fa "CellSelect-3DMorph ") 
 
 
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/CGK-Laboratory/CellSelect-3DMorph/total?style=for-the-badge&color=0c9310)
@@ -24,10 +25,13 @@ CellSelect-3DMorph imports .tif or .lsm stacks (3-dimensional images) and proces
 1. Go to the code folder
 2. Run Script_3DMorph.m
 
-### Using Windows standalone app
+### Using Windows standalone app 
+<img align="right" src="https://github.com/user-attachments/assets/53e2ba87-6964-4f01-bba3-aa1c7b81e5e0" width="60" style="margin-right: 50;">
+
 1. Download the CellSelect-3DMorph-standalone-app from [the last release](https://github.com/CGK-Laboratory/CellSelect-3DMorph/releases/latest).
 2. Install the standalone app
 3. Open the CellSelect-3DMorph app
+
 
 ### General
 Select 'Interactive Mode'. Choose your file (must be in Current Folder or add path first), input xy and z scale, and channel information. 
@@ -43,9 +47,12 @@ Control and ExCell images are provided as test samples.
   
 ## Differences with the original [3DMorph](https://github.com/ElisaYork/3DMorph) by Elisa M York
 
-<img align="right" src="https://github.com/user-attachments/assets/82b49ecb-3333-40d5-8873-73423c41683b" width="700">
 
 - New Cell Selection Functionality (you can manually select which cells to use).
+
+<img align="center" src="https://github.com/user-attachments/assets/82b49ecb-3333-40d5-8873-73423c41683b" width="600">
+<br><br>
+
 - Erosion of images for better segmentation was achieved by changing default `erosion` value and inclidun it as a parameter to be saw and change by the user easily.
 - There are pop-up windows indicating an error has occurred during segmentation.
 - Force µm as the unit to improveinterperatiuon of the results and figures.
