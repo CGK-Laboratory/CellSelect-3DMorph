@@ -26,11 +26,11 @@ CellSelect-3DMorph imports .tif or .lsm stacks (3-dimensional images) and proces
 2. Run Script_3DMorph.m
 
 ### Using Windows standalone app 
-<img align="right" src="https://github.com/user-attachments/assets/53e2ba87-6964-4f01-bba3-aa1c7b81e5e0" width="60" style="margin-right: 50;">
+<img align="right" src="https://github.com/user-attachments/assets/53e2ba87-6964-4f01-bba3-aa1c7b81e5e0" width="60">
 
 1. Download the CellSelect-3DMorph-standalone-app from [the last release](https://github.com/CGK-Laboratory/CellSelect-3DMorph/releases/latest).
-2. Install the standalone app
-3. Open the CellSelect-3DMorph app
+2. Install the standalone app.
+3. Open the CellSelect-3DMorph app.
 
 
 ### General
