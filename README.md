@@ -9,13 +9,15 @@
 <img align="right" src="https://github.com/CGK-Laboratory/CellSelect_3DMorph/assets/133057205/84d05c81-4c03-4797-9398-2243a37b15f6" width="500">
 </div>
 
-CellSelect-3DMorph is a MATLAB-based script that isolate and analyzes cells morphology from 3D images, by reconstructing the cells from fluorescent pixels. The code allows to obtain different parameters including cell volume (exact number of pixels occupied by the cell), territorial volume (maximum cell extension), ramification index (territorial volume/cell volume), branch length, number of branch and end points, and more. CellSelect uses the 3D Morph developed code but now adds the possibility of rejecting any cell that is not complete in the frame of the image (x, y and z positions) and which the morphology cannot be calculated properly.
+CellSelect-3DMorph is a MATLAB-based script that isolates and analyzes cell morphology from 3D images by reconstructing cells from fluorescent pixels. The code allows users to obtain different parameters including cell volume (exact number of pixels occupied by the cell), territorial volume (maximum cell extension), ramification index (territorial volume/cell volume), branch length, number of branches and end points, and more. CellSelect uses the 3D Morph code but adds the possibility of rejecting any cells that are not complete in the frame of the image (x, y and z positions) and whose morphology cannot be calculated properly.
+
 <br><br><br>
 
 
 Description
 ===========
-CellSelect-3DMorph as its predecessor (3DMorph) was specifically developed to isolate and analyze microglia morphology. Literature has indicated that microglial function can be related to its morphology, making morphology an approximated measure for function, for example, non-ramified microglia have been interpreted as having increased phagocytic functions while more ramified microglia have surveying functions in the cellular environment. We use CellSelect-3DMorph to study microglia plasticity. Furthermore, another interesting application of the code could be to study astrocyte morphology. 
+CellSelect-3DMorph, like its predecessor (3DMorph), was specifically developed to isolate and analyze microglia morphology. Literature has indicated that microglial function can be related to its morphology, making morphology an approximate measure of function. For example, non-ramified microglia have been interpreted as having increased phagocytic functions, while more ramified microglia have surveying functions in the cellular environment. We use CellSelect-3DMorph to study microglia plasticity. Additionally, the code could be used to study astrocyte morphology.
+
 
 CellSelect-3DMorph imports .tif or .lsm stacks (3-dimensional images) and processes cell morphologies.
 
@@ -42,7 +44,7 @@ Control and ExCell images are provided as test samples.
 
 ## Useful Links
 
-- Go to the [wiki](https://github.com/CGK-Laboratory/CellSelect-3DMorph/wiki) to find tips and turoeials.
+- Go to the [wiki](https://github.com/CGK-Laboratory/CellSelect-3DMorph/wiki) to find tips and tutorials.
 - Go to the [forum](https://github.com/CGK-Laboratory/CellSelect-3DMorph/discussions) to ask questions, see announcements or open a new discussion.
   
 ## Differences with the original [3DMorph](https://github.com/ElisaYork/3DMorph) by Elisa M York
@@ -53,8 +55,8 @@ Control and ExCell images are provided as test samples.
 <img align="center" src="https://github.com/user-attachments/assets/82b49ecb-3333-40d5-8873-73423c41683b" width="600">
 <br><br>
 
-- Erosion of images for better segmentation was achieved by changing default `erosion` value and inclidun it as a parameter to be saw and change by the user easily.
-- There are pop-up windows indicating an error has occurred during segmentation.
+- Erosion of images for better segmentation was achieved by changing the default `erosion` value and including it as a parameter to be seen and changed by the user easily.
+- Force µm as the unit to improve interpretation of the results and figures.
 - Force µm as the unit to improveinterperatiuon of the results and figures.
 - Allow the user to load videos and save the results on different folders.
 - Updated versions of dependencies:
