@@ -1,10 +1,15 @@
 
-# ![alt text](https://github.com/CGK-Laboratory/.github/assets/133057205/2d6d4003-04c6-4772-a32e-27d45efd12fa "Logo Title Text 1")
+# CellSelect-3DMorph <img align="right" src="https://github.com/user-attachments/assets/53e2ba87-6964-4f01-bba3-aa1c7b81e5e0" width="45">
+
+
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/CGK-Laboratory/CellSelect-3DMorph/total?style=for-the-badge&color=0c9310)
 
-
+<div align="center">
 <img align="right" src="https://github.com/CGK-Laboratory/CellSelect_3DMorph/assets/133057205/84d05c81-4c03-4797-9398-2243a37b15f6" width="500">
+</div>
+
 CellSelect-3DMorph is a MATLAB-based script that isolate and analyzes cells morphology from 3D images, by reconstructing the cells from fluorescent pixels. The code allows to obtain different parameters including cell volume (exact number of pixels occupied by the cell), territorial volume (maximum cell extension), ramification index (territorial volume/cell volume), branch length, number of branch and end points, and more. CellSelect uses the 3D Morph developed code but now adds the possibility of rejecting any cell that is not complete in the frame of the image (x, y and z positions) and which the morphology cannot be calculated properly.
+<br><br><br>
 
 
 Description
@@ -37,6 +42,7 @@ Control and ExCell images are provided as test samples.
 - Go to the [forum](https://github.com/CGK-Laboratory/CellSelect-3DMorph/discussions) to ask questions, see announcements or open a new discussion.
   
 ## Differences with the original [3DMorph](https://github.com/ElisaYork/3DMorph) by Elisa M York
+
 <img align="right" src="https://github.com/user-attachments/assets/82b49ecb-3333-40d5-8873-73423c41683b" width="700">
 
 - New Cell Selection Functionality (you can manually select which cells to use).
@@ -48,7 +54,8 @@ Control and ExCell images are provided as test samples.
   * [skeleton3D-matlab](https://github.com/phi-max/skeleton3d-matlab)
   * [skel2graph3d](https://github.com/phi-max/skel2graph3d-matlab)
 
-  
+------------------------------------------------------------
+
   ## Requirements 
 - 32 Gigabytes of RAM
 - Have Windows 7 or above
@@ -62,7 +69,6 @@ Control and ExCell images are provided as test samples.
 - MATLAB Parallel Server
 - Polyspace Bug Finder
 
-------------------------------------------------------------
 
 ## Citation
 
