@@ -14,9 +14,20 @@
 %(territorial volume / cell volume), number of endpoints, branch points,
 %and the minimum, maximum, and average branch length.
 
+% Check if parallel pool already exists and track if we created it
+poolExistedBefore = ~isempty(gcp('nocreate'));
+if ~poolExistedBefore
+    try
+        parpool; % Open parallel processing pool
+        fprintf('Parallel pool started by script.\n');
+    catch ME
+        warning('Failed to create parallel pool: %s. Continuing without parallel processing.', ME.message);
+    end
+else
+    fprintf('Using existing parallel pool.\n');
+end 
+
 %% Method Selection
-% delete(gcp('nocreate'));
-% parpool %Open parallel processing. 
 
 addpath(genpath('Functions'));
 addpath(genpath('icons'));
@@ -904,22 +915,21 @@ parfor i=1:numel(FullMg)
 end
 
 %Save Branch Lengths File
- if BranchLengthFile == 1
-     names = "cell1";
-     %Write in headings
+if BranchLengthFile == 1
+    BranchFilename = fullfile(outputfolder, 'BranchLengths.xlsx');
+    spreadsheet = repmat({''}, numel(FullMg), max(cellfun("length",BranchLengthList)));
+    %Write in headings
     for CellNum = 1:numel(FullMg)
         input = strcat('Cell ',num2str(CellNum));
-        names(CellNum,1) = input;
-    end   
-    BranchFilename = fullfile(outputfolder, 'BranchLengths');
-    xlswrite(BranchFilename,names(:,:),1,'A1');
-    %Write in data
-    for ColNum = 1:numel(FullMg)
-        if numel(BranchLengthList{1,ColNum})>0
-            xlswrite(BranchFilename,BranchLengthList{1,ColNum}',1,['B' num2str(ColNum)]);
+        spreadsheet{CellNum,1}= input;
+        if numel(BranchLengthList{1,CellNum})>0
+            for bix =1:length(BranchLengthList{1,CellNum})
+                spreadsheet{CellNum,bix+1}= BranchLengthList{1,CellNum}(bix);
+            end
         end
     end
- end
+    writecell(spreadsheet,BranchFilename)
+end
  
 %% Output results
 %Creates new excel sheet with file name and saves to current folder.
@@ -975,4 +985,9 @@ if Interactive == 1
     
 end
 
-delete(gcp); %close parallel pool so error isn't generated when program is run again.
+% Close parallel pool only if this script created it
+currentPool = gcp('nocreate');
+if ~poolExistedBefore && ~isempty(currentPool)
+    delete(currentPool);
+    fprintf('Parallel pool closed by script.\n');
+end
