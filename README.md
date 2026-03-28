@@ -82,5 +82,15 @@ Control and ExCell images are provided as test samples.
 ## Citation
 
 If you find CellSelect-3DMorph useful in your research, please cite:
+@article{taborda2025microglial,
+  title = {Characterizing Microglial Morphology: Methodological Advances in Confocal Imaging and Analysis},
+  author = {Taborda-Bejarano, Juan P. and Nowak, David B. and Chaure, Fernando and Allen, Malika L. and Blek, Kathryn A. and Walterhouse, Stephen and Mantsch, John R. and Garcia-Keller, Constanza},
+  journal = {Cells},
+  year = {2025},
+  volume = {14},
+  pages = {1354},
+  doi = {10.3390/cells14171354}
+}
 
-[![DOI](https://zenodo.org/badge/638673090.svg)](https://doi.org/10.5281/zenodo.14159876)
+A BibTeX entry is provided above. You can also use the DOI directly:
+https://doi.org/10.3390/cells14171354
