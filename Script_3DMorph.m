@@ -934,31 +934,31 @@ end
 %% Output results
 %Creates new excel sheet with file name and saves to current folder.
 xls_filename = fullfile(outputfolder, strcat('Results',file));
-xlswrite(xls_filename,{file},1,'B1');
-xlswrite(xls_filename,{'Avg Centroid Distance um'},1,'A2');
-xlswrite(xls_filename,AvgDist,1,'B2');
-xlswrite(xls_filename,{'TotMgTerritoryVol um3'},1,'A3');
-xlswrite(xls_filename,TotMgVol,1,'B3');
-xlswrite(xls_filename,{'TotUnoccupiedVol um3'},1,'A4');
-xlswrite(xls_filename,EmptyVol,1,'B4');
-xlswrite(xls_filename,{'PercentOccupiedVol um3'},1,'A5');
-xlswrite(xls_filename,PercentMgVol,1,'B5');
-xlswrite(xls_filename,{'CellTerritoryVol um3'},1,'D1');
-xlswrite(xls_filename,FullCellTerritoryVol(:,1),1,'E');
-xlswrite(xls_filename,{'CellVolumes'},1,'F1');
-xlswrite(xls_filename,CellVolume(:,1),1,'G');
-xlswrite(xls_filename,{'RamificationIndex'},1,'H1');
-xlswrite(xls_filename,FullCellComplexity(:,1),1,'I');
-xlswrite(xls_filename,{'NumOfEndpoints'},1,'J1');
-xlswrite(xls_filename,numendpts(:,1),1,'K');
-xlswrite(xls_filename,{'NumOfBranchpoints'},1,'L1');
-xlswrite(xls_filename,numbranchpts(:,1),1,'M');
-xlswrite(xls_filename,{'AvgBranchLength'},1,'N1');
-xlswrite(xls_filename,AvgBranchLength(:,1),1,'O');
-xlswrite(xls_filename,{'MaxBranchLength'},1,'P1');
-xlswrite(xls_filename,MaxBranchLength(:,1),1,'Q');
-xlswrite(xls_filename,{'MinBranchLength'},1,'R1');
-xlswrite(xls_filename,MinBranchLength(:,1),1,'S');
+writecell({file}, xls_filename, 'Sheet', 1, 'Range', 'B1');
+writecell({'Avg Centroid Distance um'}, xls_filename, 'Sheet', 1, 'Range', 'A2');
+writecell(num2cell(AvgDist), xls_filename, 'Sheet', 1, 'Range', 'B2');
+writecell({'TotMgTerritoryVol um3'}, xls_filename, 'Sheet', 1, 'Range', 'A3');
+writecell(num2cell(TotMgVol), xls_filename, 'Sheet', 1, 'Range', 'B3');
+writecell({'TotUnoccupiedVol um3'}, xls_filename, 'Sheet', 1, 'Range', 'A4');
+writecell(num2cell(EmptyVol), xls_filename, 'Sheet', 1, 'Range', 'B4');
+writecell({'PercentOccupiedVol um3'}, xls_filename, 'Sheet', 1, 'Range', 'A5');
+writecell(num2cell(PercentMgVol), xls_filename, 'Sheet', 1, 'Range', 'B5');
+writecell({'CellTerritoryVol um3'}, xls_filename, 'Sheet', 1, 'Range', 'D1');
+writecell(num2cell(FullCellTerritoryVol(:,1)), xls_filename, 'Sheet', 1, 'Range', 'E1');
+writecell({'CellVolumes'}, xls_filename, 'Sheet', 1, 'Range', 'F1');
+writecell(num2cell(CellVolume(:,1)), xls_filename, 'Sheet', 1, 'Range', 'G1');
+writecell({'RamificationIndex'}, xls_filename, 'Sheet', 1, 'Range', 'H1');
+writecell(num2cell(FullCellComplexity(:,1)), xls_filename, 'Sheet', 1, 'Range', 'I1');
+writecell({'NumOfEndpoints'}, xls_filename, 'Sheet', 1, 'Range', 'J1');
+writecell(num2cell(numendpts(:,1)), xls_filename, 'Sheet', 1, 'Range', 'K1');
+writecell({'NumOfBranchpoints'}, xls_filename, 'Sheet', 1, 'Range', 'L1');
+writecell(num2cell(numbranchpts(:,1)), xls_filename, 'Sheet', 1, 'Range', 'M1');
+writecell({'AvgBranchLength'}, xls_filename, 'Sheet', 1, 'Range', 'N1');
+writecell(num2cell(AvgBranchLength(:,1)), xls_filename, 'Sheet', 1, 'Range', 'O1');
+writecell({'MaxBranchLength'}, xls_filename, 'Sheet', 1, 'Range', 'P1');
+writecell(num2cell(MaxBranchLength(:,1)), xls_filename, 'Sheet', 1, 'Range', 'Q1');
+writecell({'MinBranchLength'}, xls_filename, 'Sheet', 1, 'Range', 'R1');
+writecell(num2cell(MinBranchLength(:,1)), xls_filename, 'Sheet', 1, 'Range', 'S1');
 
 if Interactive == 2
     disp(['Finished file ' num2str(total) ' of ' num2str(numel(FileList))]);
