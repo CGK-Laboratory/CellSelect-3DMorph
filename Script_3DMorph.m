@@ -41,11 +41,11 @@ switch choiceMode
         NoImages = 0;
         waitfor(main_window);
         %addpath(pathname);
-        if isempty('file')
-            print('Config window closed')
+        if ~exist('file','var') || isempty(file)
+            disp('Config window closed');
             return
         end
-        input_file_path = file; 
+        input_file_path = file;
         [~,file,~] = fileparts(file); %removes extension %this will be the start off all the outputs
         % example: file = 'con1_CD68_2'; scale = 0.46125; %1 pixel = ___ um
         FileList = 1;
@@ -144,6 +144,7 @@ end
 ConnectedComponents=bwconncomp(NoiseIm,26); %returns structure with 4 fields. PixelIdxList contains a 1-by-NumObjects cell array where the k-th element in the cell array is a vector containing the linear indices of the pixels in the k-th object. 26 defines connectivity. This looks at cube of connectivity around pixel.
 numObj = numel(ConnectedComponents.PixelIdxList); %PixelIdxList is field with list of pixels in each connected component. Find how many connected components there are.
 
+allObjs = zeros(s(1), s(2), numObj);
 %show full image compressed to 2D. Use imagesc to make it look 3D. 
 progbar = waitbar(0,'Processing your data...');
 for i = 1:numObj
@@ -169,6 +170,7 @@ end
 
     %Extract list of pixel values and which object they belong to for
     %segmentation viewing (in CellSizeCutoffGUI). 
+    ObjectList = zeros(numObj, 2);
     for i = 1:numObj
     ObjectList(i,1) = length(ConnectedComponents.PixelIdxList{1,i}); 
     ObjectList(i,2) = i;  
@@ -221,6 +223,7 @@ if ShowObjImg == 1
 end
 
 col=1;
+Microglia = cell(1, numObj);
     progbar = waitbar(0,'Segmenting...');
 for i = 1:numObj %Evaluate all connected components in PixelIdxList.
     waitbar (i/numObj, progbar);
@@ -240,7 +243,8 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
         if nuc ==1 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
             nuc = 2;
         end
-        [x,y,z]=ind2sub(size(ex),find(ex));%Find nonzero elements in ex (ie connected microglia cells) and return x y z locations.
+        idxGmm = ConnectedComponents.PixelIdxList{1,i};
+        [x,y,z] = ind2sub([s(1), s(2), zs], idxGmm(:));
         points = [x y z]; %concatenate to one array
         
         GMModel = fitgmdist(points,nuc,'replicates',3); %Fit Gaussian mixture distribution to data 
@@ -282,6 +286,7 @@ SepObjectList = sortrows(SepObjectList,-1); %Sort columns by pixel size.
 udSepObjectList = flipud(SepObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
 
 %Below is used in FullCellsGUI
+    AllSeparatedObjs = zeros(s(1), s(2), numObjSep);
     for i = 1:numObjSep
         ex=zeros(s(1),s(2),zs);
         ex(Microglia{1,i})=1;%write in only one object to image. Cells are white on black background.
@@ -451,6 +456,7 @@ if Interactive == 1
 
     %this is recomputed, could b better get it from the previous step
     clear AllSeparatedObjs
+    AllSeparatedObjs = zeros(s(1), s(2), numObjMg);
     for i = 1:numObjMg
         ex=zeros(s(1),s(2),zs);
         ex(FullMg{1,i})=1;%write in only one object to image. Cells are white on black background.
@@ -475,6 +481,7 @@ end
 
 %Extract list of pixel values and which object they belong to for
 %segmentation viewing (in FullCellsGUI).
+MgObjectList = zeros(numObjMg, 2);
 for i = 1:numObjMg
     MgObjectList(i,1) = length(FullMg{1,i}); 
     MgObjectList(i,2) = i;  
