@@ -68,7 +68,7 @@ end
 for total = 1:numel(FileList)
 %% Load file and saved values
 
-clearvars -except input_file_path file ch ChannelOfInterest scale Erosion zscale Parameters FileList PathList Interactive NoImages total outputfolder
+clearvars -except input_file_path file ch ChannelOfInterest scale Erosion zscale Parameters FileList PathList Interactive NoImages total outputfolder poolExistedBefore
 
 if Interactive == 2
     load(Parameters);
