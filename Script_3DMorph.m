@@ -14,9 +14,20 @@
 %(territorial volume / cell volume), number of endpoints, branch points,
 %and the minimum, maximum, and average branch length.
 
+% Check if parallel pool already exists and track if we created it
+poolExistedBefore = ~isempty(gcp('nocreate'));
+if ~poolExistedBefore
+    try
+        parpool; % Open parallel processing pool
+        fprintf('Parallel pool started by script.\n');
+    catch ME
+        warning('Failed to create parallel pool: %s. Continuing without parallel processing.', ME.message);
+    end
+else
+    fprintf('Using existing parallel pool.\n');
+end 
+
 %% Method Selection
-% delete(gcp('nocreate'));
-% parpool %Open parallel processing. 
 
 addpath(genpath('Functions'));
 addpath(genpath('icons'));
@@ -30,11 +41,11 @@ switch choiceMode
         NoImages = 0;
         waitfor(main_window);
         %addpath(pathname);
-        if isempty('file')
-            print('Config window closed')
+        if ~exist('file','var') || isempty(file)
+            disp('Config window closed');
             return
         end
-        input_file_path = file; 
+        input_file_path = file;
         [~,file,~] = fileparts(file); %removes extension %this will be the start off all the outputs
         % example: file = 'con1_CD68_2'; scale = 0.46125; %1 pixel = ___ um
         FileList = 1;
@@ -57,7 +68,7 @@ end
 for total = 1:numel(FileList)
 %% Load file and saved values
 
-clearvars -except input_file_path file ch ChannelOfInterest scale Erosion zscale Parameters FileList PathList Interactive NoImages total outputfolder
+clearvars -except input_file_path file ch ChannelOfInterest scale Erosion zscale Parameters FileList PathList Interactive NoImages total outputfolder poolExistedBefore
 
 if Interactive == 2
     load(Parameters);
@@ -133,6 +144,7 @@ end
 ConnectedComponents=bwconncomp(NoiseIm,26); %returns structure with 4 fields. PixelIdxList contains a 1-by-NumObjects cell array where the k-th element in the cell array is a vector containing the linear indices of the pixels in the k-th object. 26 defines connectivity. This looks at cube of connectivity around pixel.
 numObj = numel(ConnectedComponents.PixelIdxList); %PixelIdxList is field with list of pixels in each connected component. Find how many connected components there are.
 
+allObjs = zeros(s(1), s(2), numObj);
 %show full image compressed to 2D. Use imagesc to make it look 3D. 
 progbar = waitbar(0,'Processing your data...');
 for i = 1:numObj
@@ -158,6 +170,7 @@ end
 
     %Extract list of pixel values and which object they belong to for
     %segmentation viewing (in CellSizeCutoffGUI). 
+    ObjectList = zeros(numObj, 2);
     for i = 1:numObj
     ObjectList(i,1) = length(ConnectedComponents.PixelIdxList{1,i}); 
     ObjectList(i,2) = i;  
@@ -210,6 +223,7 @@ if ShowObjImg == 1
 end
 
 col=1;
+Microglia = cell(1, numObj);
     progbar = waitbar(0,'Segmenting...');
 for i = 1:numObj %Evaluate all connected components in PixelIdxList.
     waitbar (i/numObj, progbar);
@@ -229,7 +243,8 @@ for i = 1:numObj %Evaluate all connected components in PixelIdxList.
         if nuc ==1 %If erosion only detects one nuc, but this should be segmented, increase nuc to at least 2
             nuc = 2;
         end
-        [x,y,z]=ind2sub(size(ex),find(ex));%Find nonzero elements in ex (ie connected microglia cells) and return x y z locations.
+        idxGmm = ConnectedComponents.PixelIdxList{1,i};
+        [x,y,z] = ind2sub([s(1), s(2), zs], idxGmm(:));
         points = [x y z]; %concatenate to one array
         
         GMModel = fitgmdist(points,nuc,'replicates',3); %Fit Gaussian mixture distribution to data 
@@ -271,6 +286,7 @@ SepObjectList = sortrows(SepObjectList,-1); %Sort columns by pixel size.
 udSepObjectList = flipud(SepObjectList);%ObjectList is large to small, flip upside down so small is plotted first in blue.
 
 %Below is used in FullCellsGUI
+    AllSeparatedObjs = zeros(s(1), s(2), numObjSep);
     for i = 1:numObjSep
         ex=zeros(s(1),s(2),zs);
         ex(Microglia{1,i})=1;%write in only one object to image. Cells are white on black background.
@@ -440,6 +456,7 @@ if Interactive == 1
 
     %this is recomputed, could b better get it from the previous step
     clear AllSeparatedObjs
+    AllSeparatedObjs = zeros(s(1), s(2), numObjMg);
     for i = 1:numObjMg
         ex=zeros(s(1),s(2),zs);
         ex(FullMg{1,i})=1;%write in only one object to image. Cells are white on black background.
@@ -464,6 +481,7 @@ end
 
 %Extract list of pixel values and which object they belong to for
 %segmentation viewing (in FullCellsGUI).
+MgObjectList = zeros(numObjMg, 2);
 for i = 1:numObjMg
     MgObjectList(i,1) = length(FullMg{1,i}); 
     MgObjectList(i,2) = i;  
@@ -904,51 +922,50 @@ parfor i=1:numel(FullMg)
 end
 
 %Save Branch Lengths File
- if BranchLengthFile == 1
-     names = "cell1";
-     %Write in headings
+if BranchLengthFile == 1
+    BranchFilename = fullfile(outputfolder, 'BranchLengths.xlsx');
+    spreadsheet = repmat({''}, numel(FullMg), max(cellfun("length",BranchLengthList)));
+    %Write in headings
     for CellNum = 1:numel(FullMg)
         input = strcat('Cell ',num2str(CellNum));
-        names(CellNum,1) = input;
-    end   
-    BranchFilename = fullfile(outputfolder, 'BranchLengths');
-    xlswrite(BranchFilename,names(:,:),1,'A1');
-    %Write in data
-    for ColNum = 1:numel(FullMg)
-        if numel(BranchLengthList{1,ColNum})>0
-            xlswrite(BranchFilename,BranchLengthList{1,ColNum}',1,['B' num2str(ColNum)]);
+        spreadsheet{CellNum,1}= input;
+        if numel(BranchLengthList{1,CellNum})>0
+            for bix =1:length(BranchLengthList{1,CellNum})
+                spreadsheet{CellNum,bix+1}= BranchLengthList{1,CellNum}(bix);
+            end
         end
     end
- end
+    writecell(spreadsheet,BranchFilename)
+end
  
 %% Output results
 %Creates new excel sheet with file name and saves to current folder.
-xls_filename = fullfile(outputfolder, strcat('Results',file));
-xlswrite(xls_filename,{file},1,'B1');
-xlswrite(xls_filename,{'Avg Centroid Distance um'},1,'A2');
-xlswrite(xls_filename,AvgDist,1,'B2');
-xlswrite(xls_filename,{'TotMgTerritoryVol um3'},1,'A3');
-xlswrite(xls_filename,TotMgVol,1,'B3');
-xlswrite(xls_filename,{'TotUnoccupiedVol um3'},1,'A4');
-xlswrite(xls_filename,EmptyVol,1,'B4');
-xlswrite(xls_filename,{'PercentOccupiedVol um3'},1,'A5');
-xlswrite(xls_filename,PercentMgVol,1,'B5');
-xlswrite(xls_filename,{'CellTerritoryVol um3'},1,'D1');
-xlswrite(xls_filename,FullCellTerritoryVol(:,1),1,'E');
-xlswrite(xls_filename,{'CellVolumes'},1,'F1');
-xlswrite(xls_filename,CellVolume(:,1),1,'G');
-xlswrite(xls_filename,{'RamificationIndex'},1,'H1');
-xlswrite(xls_filename,FullCellComplexity(:,1),1,'I');
-xlswrite(xls_filename,{'NumOfEndpoints'},1,'J1');
-xlswrite(xls_filename,numendpts(:,1),1,'K');
-xlswrite(xls_filename,{'NumOfBranchpoints'},1,'L1');
-xlswrite(xls_filename,numbranchpts(:,1),1,'M');
-xlswrite(xls_filename,{'AvgBranchLength'},1,'N1');
-xlswrite(xls_filename,AvgBranchLength(:,1),1,'O');
-xlswrite(xls_filename,{'MaxBranchLength'},1,'P1');
-xlswrite(xls_filename,MaxBranchLength(:,1),1,'Q');
-xlswrite(xls_filename,{'MinBranchLength'},1,'R1');
-xlswrite(xls_filename,MinBranchLength(:,1),1,'S');
+xls_filename = fullfile(outputfolder, strcat('Results',file,'.xlsx'));
+writecell({file}, xls_filename, 'Sheet', 1, 'Range', 'B1');
+writecell({'Avg Centroid Distance um'}, xls_filename, 'Sheet', 1, 'Range', 'A2');
+writecell(num2cell(AvgDist), xls_filename, 'Sheet', 1, 'Range', 'B2');
+writecell({'TotMgTerritoryVol um3'}, xls_filename, 'Sheet', 1, 'Range', 'A3');
+writecell(num2cell(TotMgVol), xls_filename, 'Sheet', 1, 'Range', 'B3');
+writecell({'TotUnoccupiedVol um3'}, xls_filename, 'Sheet', 1, 'Range', 'A4');
+writecell(num2cell(EmptyVol), xls_filename, 'Sheet', 1, 'Range', 'B4');
+writecell({'PercentOccupiedVol um3'}, xls_filename, 'Sheet', 1, 'Range', 'A5');
+writecell(num2cell(PercentMgVol), xls_filename, 'Sheet', 1, 'Range', 'B5');
+writecell({'CellTerritoryVol um3'}, xls_filename, 'Sheet', 1, 'Range', 'D1');
+writecell(num2cell(FullCellTerritoryVol(:,1)), xls_filename, 'Sheet', 1, 'Range', 'E1');
+writecell({'CellVolumes'}, xls_filename, 'Sheet', 1, 'Range', 'F1');
+writecell(num2cell(CellVolume(:,1)), xls_filename, 'Sheet', 1, 'Range', 'G1');
+writecell({'RamificationIndex'}, xls_filename, 'Sheet', 1, 'Range', 'H1');
+writecell(num2cell(FullCellComplexity(:,1)), xls_filename, 'Sheet', 1, 'Range', 'I1');
+writecell({'NumOfEndpoints'}, xls_filename, 'Sheet', 1, 'Range', 'J1');
+writecell(num2cell(numendpts(:,1)), xls_filename, 'Sheet', 1, 'Range', 'K1');
+writecell({'NumOfBranchpoints'}, xls_filename, 'Sheet', 1, 'Range', 'L1');
+writecell(num2cell(numbranchpts(:,1)), xls_filename, 'Sheet', 1, 'Range', 'M1');
+writecell({'AvgBranchLength'}, xls_filename, 'Sheet', 1, 'Range', 'N1');
+writecell(num2cell(AvgBranchLength(:,1)), xls_filename, 'Sheet', 1, 'Range', 'O1');
+writecell({'MaxBranchLength'}, xls_filename, 'Sheet', 1, 'Range', 'P1');
+writecell(num2cell(MaxBranchLength(:,1)), xls_filename, 'Sheet', 1, 'Range', 'Q1');
+writecell({'MinBranchLength'}, xls_filename, 'Sheet', 1, 'Range', 'R1');
+writecell(num2cell(MinBranchLength(:,1)), xls_filename, 'Sheet', 1, 'Range', 'S1');
 
 if Interactive == 2
     disp(['Finished file ' num2str(total) ' of ' num2str(numel(FileList))]);
@@ -975,4 +992,9 @@ if Interactive == 1
     
 end
 
-delete(gcp); %close parallel pool so error isn't generated when program is run again.
+% Close parallel pool only if this script created it
+currentPool = gcp('nocreate');
+if ~poolExistedBefore && ~isempty(currentPool)
+    delete(currentPool);
+    fprintf('Parallel pool closed by script.\n');
+end
