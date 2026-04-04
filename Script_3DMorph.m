@@ -940,7 +940,7 @@ end
  
 %% Output results
 %Creates new excel sheet with file name and saves to current folder.
-xls_filename = fullfile(outputfolder, strcat('Results',file));
+xls_filename = fullfile(outputfolder, strcat('Results',file,'.xlsx'));
 writecell({file}, xls_filename, 'Sheet', 1, 'Range', 'B1');
 writecell({'Avg Centroid Distance um'}, xls_filename, 'Sheet', 1, 'Range', 'A2');
 writecell(num2cell(AvgDist), xls_filename, 'Sheet', 1, 'Range', 'B2');
