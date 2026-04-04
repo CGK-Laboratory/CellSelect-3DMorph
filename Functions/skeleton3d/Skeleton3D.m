@@ -135,20 +135,28 @@ while( unchangedBorders < 6 )  % loop until no change for all six border types
 
                          % Check for the simple plint criteria
                         no_single_change = true ;
+                        reverted = false(size(li));
                         if any(di_rc) % if topology changed: revert
                             skel(li(di_rc)) = true;
+                            reverted(di_rc) = true;
                             no_single_change = false;
                         end
                         
                         % Check for the euler criteria
                         if any(di_rc_euler)
                             skel(li(di_rc_euler)) = true;
+                            reverted(di_rc_euler) = true;
                             no_single_change = false;
                         end
                
                         if no_single_change
                             noChange = false; % at least one voxel removed
                         end
+
+                        if any(~reverted)
+                            noChange = false; 
+                        end
+
                     end
                 end
             end
